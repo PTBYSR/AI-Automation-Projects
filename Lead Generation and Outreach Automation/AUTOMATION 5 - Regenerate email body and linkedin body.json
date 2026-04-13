@@ -1,0 +1,711 @@
+{
+  "name": "AUTOMATION 5 - Regenerate email body and linkedin body",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "de54f7d8-6964-4185-baec-b88cba101812",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "96953bd7-fabe-4795-b46f-fcf71bb2bd10",
+      "name": "Webhook",
+      "webhookId": "de54f7d8-6964-4185-baec-b88cba101812"
+    },
+    {
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "value": "appO1iAwuhRNNC3Ju",
+          "mode": "list",
+          "cachedResultName": "Lead Gen Dashboard",
+          "cachedResultUrl": "https://airtable.com/appO1iAwuhRNNC3Ju"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl055rl0vW6TWh0X",
+          "mode": "list",
+          "cachedResultName": "Table 2 — Leads",
+          "cachedResultUrl": "https://airtable.com/appO1iAwuhRNNC3Ju/tbl055rl0vW6TWh0X"
+        },
+        "id": "={{ $json.query.leadId }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "06251492-39cd-498c-9f94-c29428e09cee",
+      "name": "Get a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are an expert B2B copywriter specialising in cold outreach for early-stage tech and automation services. You write LinkedIn connection requests that feel human, specific, and low-pressure. Your messages never sound like a template, never use buzzwords, and never lead or end with a hard pitch. You write the way a thoughtful founder would reach out to a peer — curious, direct, and brief.\n\nRules you never break:\n- Maximum 300 characters total — this is a LinkedIn connection request note, not a message\n- Never use the words: synergy, leverage, scalable, revolutionise, game-changer, exciting opportunity, or reach out\n- Never start with \"I\" — start with the recipient's first name or a reference to their company\n- One specific reference to what their company actually does — drawn only from the context provided, never invented\n- a question about how they currently execute a business workflow in their company comes in the final sentence only — and it must feel like a natural observation, not a sales line\n- No emojis\n- No sign-off, no \"Best regards\", no name at the end — LinkedIn already shows who you are",
+              "role": "model"
+            },
+            {
+              "content": "=Write a LinkedIn connection request note for this lead:\n\nFirst name: {{ $json.fields['First Name'] }}\nJob title: {{ $json.fields['Job Title'] }}\nCompany: {{ $json.fields['Company Name'] }}\nCompany context: {{ $json.fields['About Section'] }}\n\nOur service: We connect early-stage founders and operations leads with trained AI automation assistants that take repetitive workflows off their plate entirely. We are running outbound campaigns targeting founders, ops leads, and agency owners who would benefit from having a dedicated automation assistant on their team.\n\nWrite one LinkedIn connection request note under 300 characters. Reference something specific about{{ $json.fields['Company Name'] }}  from the context above. End with a single low-pressure question on how they currently go about a particular business operational workflow. Do not fabricate any company details — if the context is thin, keep the reference general and focus on their job title instead.\n\nReturn only the message text. No labels, no quotes, no explanation."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "8f9d12c0-de25-4203-924f-aec5f8610d51",
+      "name": "generate linkedin message",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "5wRAjsiqSnpYVVqb",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.1-pro-preview",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.1-pro-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a world-class B2B sales copywriter specializing in \"Founder-to-Founder\" \ncold outreach. Your style is minimalist, conversational, and completely devoid of \n\"marketing speak\" or corporate clichés like \"I hope this finds you well\" or \n\"revolutionary solution\".\n\nThe Goal: Start a conversation about moving manual, repetitive tasks to an AI \nautomation assistant that handles the operational glue work so founders and ops \nleads can focus on high-leverage decisions.\n\nThe Lead:\nFirst name: {{ $('Get a record').item.json.fields['First Name'] }}\nTitle: {{ $('Get a record').item.json.fields['Job Title'] }}\nCompany: {{ $('Get a record').item.json.fields['Company Name'] }}\nContext: {{ $('Get a record').item.json.fields['About Section'] }}\n\nCRITICAL INSTRUCTION: The lead's first name is . \nYou must write this actual name directly into every email greeting. \nNever write [First Name], [Name], or any bracket placeholder anywhere in your output. \nIf the first name field appears empty, use \"Hi there\" as the greeting instead.\n\nThe Sequence Requirements:\n\nEmail 1 — The Hook (Day 0):\nOpen with \"Hi {{ $('Get a record').item.json.fields['First Name'] }},\" then write 3 to 4 \nsentences maximum. Reference one specific operational detail drawn only from the \ncontext provided about {{ $('Get a record').item.json.fields['Company Name'] }} — never \ninvent details. Ask one focused question about how much of their week as a {{ $('Get a record').item.json.fields['Job Title'] }}\nis spent on manual admin versus \nhigh-level strategy. End with a single low-pressure question, not a call to action.\n\nEmail 2 — The Value Add (Day 4):\nOpen with \"Hi {{ $('Get a record').item.json.fields['First Name'] }},\" then write 2 to 3 \nsentences maximum. Mention one specific workflow an automation assistant typically \nhandles that is plausibly relevant to {{ $('Get a record').item.json.fields['Company Name'] }}\nbased on the context — for example lead data cleaning, approval chasing, CRM \nupdates, or report generation. Ask if that specific thing is a bottleneck for them \nright now. Do not repeat anything said in Email 1.\n\nEmail 3 — The Soft Close (Day 9):\nOpen with \"Hello {{ $('Get a record').item.json.fields['First Name'] }},\" then write 2 sentences \nmaximum. Low-pressure check-in only. Ask if timing is off or if they have already \nautomated their backend operations. No pitch, no new information, no guilt. \nJust a clean door left open.\n\nOutput Rules:\n- Return only a single valid JSON object — no markdown, no code fences, \n  no explanation, no text before or after the JSON\n- Use exactly these six keys and no others:\n  email1_subject, email1_body, email2_subject, email2_body, email3_subject, email3_body\n- All values must be plain strings\n- Use \\n\\n for paragraph breaks inside body strings\n- Subject lines must be under 60 characters, conversational, and never start \n  with Re: or Fwd:\n- Never use these words anywhere in the output: synergy, leverage, scalable, \n  revolutionary, game-changer, seamless, streamline, cutting-edge, \n  \"I hope this finds you well\", \"reaching out\"\n\nReturn this exact JSON structure:\n{\n  \"email1_subject\": \"\",\n  \"email1_body\": \"\",\n  \"email2_subject\": \"\",\n  \"email2_body\": \"\",\n  \"email3_subject\": \"\",\n  \"email3_body\": \"\"\n}",
+              "role": "model"
+            },
+            {
+              "content": "=Please generate the 3-email sequence for the following lead:\n\nName: {{ $('Get a record').item.json.fields['First Name'] }}\nTitle: {{ $('Get a record').item.json.fields['Job Title'] }}\nCompany: {{ $('Get a record').item.json.fields['Company Name'] }}\nContext: {{ $('Get a record').item.json.fields['About Section'] }}\n\nEnsure you strictly follow the JSON output rules and tone constraints provided in your system instructions. Do not include any text outside of the JSON object."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "9548c81f-9b82-4b27-85ca-13267bd92683",
+      "name": "generate 3 email sequence",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "5wRAjsiqSnpYVVqb",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1f47ad00-1587-427e-974d-29f7677f7ca3",
+              "name": "linkedInMessage",
+              "value": "={{ $('generate linkedin message').item.json.content.parts[0].text }}",
+              "type": "string"
+            },
+            {
+              "id": "c41d8afc-7665-4b0c-b377-ba462a969399",
+              "name": "email1_body",
+              "value": "={{ $json.email1_body }}",
+              "type": "string"
+            },
+            {
+              "id": "9e0956e8-c720-4105-bb72-a4dbff990e60",
+              "name": "email2_body",
+              "value": "={{ $json.email2_body }}",
+              "type": "string"
+            },
+            {
+              "id": "6acf4761-c38a-486d-9f4e-7d2def4d4f3a",
+              "name": "email3_body",
+              "value": "={{ $json.email3_body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        0
+      ],
+      "id": "b264b532-3681-475a-9a96-d223fe520961",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  try {\n    // 1. Navigate to the deeply nested 'text' string\n    const rawString = item.json.content.parts[0].text;\n\n    // 2. Parse that string into a real JSON object\n    const parsedJson = JSON.parse(rawString);\n\n    // 3. Return only the readable fields\n    return {\n      json: {\n        email1_subject: parsedJson.email1_subject,\n        email1_body: parsedJson.email1_body,\n        email2_subject: parsedJson.email2_subject,\n        email2_body: parsedJson.email2_body,\n        email3_subject: parsedJson.email3_subject,\n        email3_body: parsedJson.email3_body\n      }\n    };\n  } catch (error) {\n    // 4. Fallback if the LLM output is malformed\n    return {\n      json: {\n        error: \"Failed to parse LLM text output\",\n        raw: item.json.content.parts[0].text\n      }\n    };\n  }\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        0
+      ],
+      "id": "d38da591-bc37-4820-b4f1-83dc0e868f5f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appO1iAwuhRNNC3Ju",
+          "mode": "list",
+          "cachedResultName": "Lead Gen Dashboard",
+          "cachedResultUrl": "https://airtable.com/appO1iAwuhRNNC3Ju"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl055rl0vW6TWh0X",
+          "mode": "list",
+          "cachedResultName": "Table 2 — Leads",
+          "cachedResultUrl": "https://airtable.com/appO1iAwuhRNNC3Ju/tbl055rl0vW6TWh0X"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Webhook').item.json.query.leadId }}",
+            "Email Step 1": "={{ $json.email1_body }}",
+            "Email Step 2": "={{ $json.email2_body }}",
+            "Email Step 3": "={{ $json.email3_body }}",
+            "LinkedIn Message": "={{ $json.linkedInMessage }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Campaign",
+              "displayName": "Campaign",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Job Title",
+              "displayName": "Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Company Website",
+              "displayName": "Company Website",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Company LinkedIn URL",
+              "displayName": "Company LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Personal LinkedIn URL",
+              "displayName": "Personal LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Company Size",
+              "displayName": "Company Size",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "About Section",
+              "displayName": "About Section",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Website Valid",
+              "displayName": "Website Valid",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Personal LinkedIn Valid",
+              "displayName": "Personal LinkedIn Valid",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email Status",
+              "displayName": "Email Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pending",
+                  "value": "Pending"
+                },
+                {
+                  "name": "Deliverable",
+                  "value": "Deliverable"
+                },
+                {
+                  "name": "Undeliverable",
+                  "value": "Undeliverable"
+                },
+                {
+                  "name": "Risky",
+                  "value": "Risky"
+                },
+                {
+                  "name": "Unknown",
+                  "value": "Unknown"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email Score",
+              "displayName": "Email Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email Step 1",
+              "displayName": "Email Step 1",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email Step 2",
+              "displayName": "Email Step 2",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email Step 3",
+              "displayName": "Email Step 3",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn Message",
+              "displayName": "LinkedIn Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "System & Workflow",
+              "displayName": "System & Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Lead Status",
+              "displayName": "Lead Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Raw",
+                  "value": "Raw"
+                },
+                {
+                  "name": "Enriched",
+                  "value": "Enriched"
+                },
+                {
+                  "name": "Ready",
+                  "value": "Ready"
+                },
+                {
+                  "name": "Skipped",
+                  "value": "Skipped"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Table 3 — Error Logs",
+              "displayName": "Table 3 — Error Logs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Table 1 — Persona Config",
+              "displayName": "Table 1 — Persona Config",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Campaign ID (from Table 1 — Persona Config)",
+              "displayName": "Campaign ID (from Table 1 — Persona Config)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Regenerate Content",
+              "displayName": "Regenerate Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        0
+      ],
+      "id": "7398004e-8ff5-4e81-962c-479730090b73",
+      "name": "Update record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 302,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Location",
+                "value": "=https://airtable.com/appO1iAwuhRNNC3Ju/pagRqj1IAnWGF3MUt?va2fn={{ $json.id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1824,
+        0
+      ],
+      "id": "a4eeffcb-d1ce-4580-a00c-78cdca53b04e",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a record": {
+      "main": [
+        [
+          {
+            "node": "generate linkedin message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate linkedin message": {
+      "main": [
+        [
+          {
+            "node": "generate 3 email sequence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate 3 email sequence": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update record": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "2845b7e7-3bb3-4e35-a6b5-fba0833ea69f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2c950992e72c1f7626700d7c88cf07f1fa608dd6abbe3ba3e9ff0a6cfdcbd670"
+  },
+  "id": "58qd96k13y6St09D",
+  "tags": []
+}

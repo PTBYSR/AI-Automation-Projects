@@ -1,0 +1,71 @@
+{
+  "name": "Week 6 ERROR TRIGGER MAIN WORKFLOW",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e19e6660-f37b-4c4b-9da1-6f251618e325",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0ASBE2N8J0",
+          "mode": "list",
+          "cachedResultName": "automation-errors"
+        },
+        "text": "=Error Detected!\nWorkflow: {{ $json.workflow.name }}\nNode: {{ $json.execution.lastNodeExecuted }}\nMessage: {{ $json.execution.error.message }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4a7eb4b5-5966-4c60-bfad-5bb6954d14ec",
+      "name": "Send a error message",
+      "webhookId": "9578ffa1-f66c-431e-8de6-0a76f6f7ef67",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "vef3yw5qjheKJVCL",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a error message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "934ae2c6-21b3-4887-b763-c2d34ce3e789",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2c950992e72c1f7626700d7c88cf07f1fa608dd6abbe3ba3e9ff0a6cfdcbd670"
+  },
+  "id": "450atFi5lhNgp3qp",
+  "tags": []
+}

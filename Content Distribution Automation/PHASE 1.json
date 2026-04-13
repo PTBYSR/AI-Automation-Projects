@@ -1,0 +1,2252 @@
+{
+  "name": "WEEK_4_AUTOMATION PHASE 1",
+  "nodes": [
+    {
+      "parameters": {
+        "text": "={{ $json.unified_content }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "header",
+              "description": "header for the raw content idea",
+              "required": true
+            },
+            {
+              "name": "body",
+              "description": "summarisation of the raw content idea to serve as the base idea. ",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        80
+      ],
+      "id": "59e23848-9021-40c6-9b9c-fda85baa5566",
+      "name": "Information Extractor",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        304
+      ],
+      "id": "55f919bf-8d9c-41a1-9b4c-ebcdd9fc3eb3",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "8hPrBjFXvWvVS9z7",
+          "name": "OpenAi account 8"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Phase 1: Data Extraction & Cleaning\n",
+        "height": 1744,
+        "width": 5056
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        -800
+      ],
+      "id": "b428a39a-f2f7-4021-8522-571c75e7aab4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a03fcc39-b811-49fd-b567-0969b0f6f7f8",
+              "leftValue": "={{ $('Extraction Webhook').item.json.body[0].source_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -576,
+        -32
+      ],
+      "id": "6f303fb3-d57f-493b-8eb1-fda8284b63d4",
+      "name": "Routes into URL or Raw Text"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {
+          "webSearch": {
+            "searchContextSize": "medium"
+          }
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2480,
+        496
+      ],
+      "id": "8cdd56c7-2b26-4f6a-8d00-603d8be78502",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "8hPrBjFXvWvVS9z7",
+          "name": "OpenAi account 8"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Add The 3 Angles').item.json.angle }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2736,
+        496
+      ],
+      "id": "7240723b-0b37-43d5-a582-3ecec56b81e1",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c434f28b-2f6a-41ce-a597-806d7ca85c75",
+              "name": "status",
+              "value": "=form_data_received",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2608,
+        -64
+      ],
+      "id": "ba7184a2-8cb1-4efc-9a97-defdbdda6539",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2944,
+        -64
+      ],
+      "id": "9690c14f-a182-4e57-8bcc-f0bf0394d01f",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e1bbd678-2b08-412c-b3fc-64cafa186ba7",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -800,
+        -272
+      ],
+      "id": "a5a4b357-95de-4cdc-a975-0f19fb277295",
+      "name": "Extraction Webhook",
+      "webhookId": "e1bbd678-2b08-412c-b3fc-64cafa186ba7"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appwBx6rEQBKUgKZs",
+          "mode": "list",
+          "cachedResultName": "Fetemi Tech Team",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliCYjGstZiLt8o6",
+          "mode": "list",
+          "cachedResultName": "Content Publish Automation Logs",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs/tbliCYjGstZiLt8o6"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Info Extractor Output": "=",
+            "Status": "data_cleaned",
+            "Request ID": "={{ $('Extraction Webhook').item.json.body[0].request_id }}"
+          },
+          "matchingColumns": [
+            "Request ID"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Request ID",
+              "displayName": "Request ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Source URL",
+              "displayName": "Source URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Submission Type",
+              "displayName": "Submission Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Info Extractor Output",
+              "displayName": "Info Extractor Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw Articles Output",
+              "displayName": "Raw Articles Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw WH Response",
+              "displayName": "Raw WH Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -128,
+        80
+      ],
+      "id": "c3679cb8-dbac-4317-b5eb-d219045ced2a",
+      "name": "Update Status - Data Cleaning",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appwBx6rEQBKUgKZs",
+          "mode": "list",
+          "cachedResultName": "Fetemi Tech Team",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliCYjGstZiLt8o6",
+          "mode": "list",
+          "cachedResultName": "Content Publish Automation Logs",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs/tbliCYjGstZiLt8o6"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Request ID": "={{ $('Extraction Webhook').item.json.body[0].request_id }}",
+            "Source URL": "={{ JSON.stringify($('Extraction Webhook').item.json.body[0].source_url) }}",
+            "Status": "form_data_received"
+          },
+          "matchingColumns": [
+            "Request ID"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Request ID",
+              "displayName": "Request ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw WH Response",
+              "displayName": "Raw WH Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Source URL",
+              "displayName": "Source URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Submission Type",
+              "displayName": "Submission Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Info Extractor Output",
+              "displayName": "Info Extractor Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        -128
+      ],
+      "id": "da035587-70e9-4482-a914-c71f570d1528",
+      "name": "Update Status - Source Data Received",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c434f28b-2f6a-41ce-a597-806d7ca85c75",
+              "name": "status",
+              "value": "=form_data_received",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        -128
+      ],
+      "id": "87a34dab-0031-4886-bd5b-3859bc80197d",
+      "name": "Cleaning Output"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c434f28b-2f6a-41ce-a597-806d7ca85c75",
+              "name": "status",
+              "value": "=form_data_received",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -576,
+        -320
+      ],
+      "id": "3a58a2ae-08b5-478e-9a27-7a9a3d4335f9",
+      "name": "Cleaning Output1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the base idea from the previous node\nconst baseIdea = $input.first().json.output;\n\n// Output 3 distinct items. The AI Agent will run once for each.\nreturn [\n  { json: { angle: \"A step-by-step How-To guide\", content: baseIdea } },\n  { json: { angle: \"A Contrarian, opinionated take\", content: baseIdea } },\n  { json: { angle: \"A data-driven Case Study\", content: baseIdea } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2256,
+        272
+      ],
+      "id": "7c930c24-426b-454d-bb35-851ea20e83a9",
+      "name": "Add The 3 Angles"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Grab the master request ID from the Webhook\nconst requestId = $('Extraction Webhook').first().json.body[0].request_id;\n\n// 2. Process all 3 items (mapping to the 'output' key you provided)\nreturn $input.all().map((item, index) => {\n  const rawMarkdown = item.json.output || \"\";\n  \n  // --- Angle Priority Logic ---\n  // We check for \"Case Study\" and \"Contrarian\" BEFORE \"How-To\"\n  let detectedAngle = \"SEO Article\"; \n  const lower = rawMarkdown.toLowerCase();\n\n  if (lower.includes(\"case study\") || lower.includes(\"data-driven\")) {\n    detectedAngle = \"Case Study\";\n  } else if (lower.includes(\"contrarian\") || lower.includes(\"opinionated\")) {\n    detectedAngle = \"Contrarian\";\n  } else if (lower.includes(\"step-by-step\") || lower.includes(\"how-to\")) {\n    detectedAngle = \"How-To Guide\";\n  }\n\n  // --- Title & Image Prompt Extraction ---\n  const titleMatch = rawMarkdown.match(/^#\\s+(.*)/m);\n  const title = titleMatch ? titleMatch[1] : \"Untitled Draft\";\n  const imageMatch = rawMarkdown.match(/!\\[Image:\\s*(.*?)\\]/);\n  const semanticPrompt = imageMatch ? imageMatch[1] : \"Professional B2B SaaS illustration\";\n\n  // --- Body Cleaning ---\n  const cleanBody = rawMarkdown\n    .replace(/^#\\s+.*\\n?/, '')      // Removes H1\n    .replace(/!\\[Image:.*?\\]/g, '') // Removes ![Image] tag\n    .trim();\n\n  // Return as separate items so OpenAI/GDrive run 3 times\n  return {\n    json: {\n      request_id: requestId, // Passed through for the final wrap\n      id: `draft_${index + 1}_${Date.now()}`,\n      title: title.trim(),\n      angle: detectedAngle,\n      body: cleanBody,\n      image_prompt: `High-quality, professional, minimalist Vercel-style graphic: ${semanticPrompt}`,\n      word_count: cleanBody.split(/\\s+/).filter(x => x.length > 0).length\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2944,
+        176
+      ],
+      "id": "d5edfd3b-582e-44d7-b29d-937f98c150c7",
+      "name": "Add Request ID To Each Article"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appwBx6rEQBKUgKZs",
+          "mode": "list",
+          "cachedResultName": "Fetemi Tech Team",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliCYjGstZiLt8o6",
+          "mode": "list",
+          "cachedResultName": "Content Publish Automation Logs",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs/tbliCYjGstZiLt8o6"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Request ID": "={{ $('Extraction Webhook').item.json.body[0].request_id }}",
+            "Status": "llm_create_articles"
+          },
+          "matchingColumns": [
+            "Request ID"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Request ID",
+              "displayName": "Request ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw WH Response",
+              "displayName": "Raw WH Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Source URL",
+              "displayName": "Source URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Submission Type",
+              "displayName": "Submission Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Info Extractor Output",
+              "displayName": "Info Extractor Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3168,
+        -64
+      ],
+      "id": "79d65dbf-e692-4a49-849a-e671e504dd4b",
+      "name": "Update Status - LLM Creating Articles",
+      "retryOnFail": false,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3168,
+        176
+      ],
+      "id": "cc01c9f2-0ac6-42ca-a9c6-61c99d080907",
+      "name": "Run Once Handler1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let finalContent = \"\";\n\n// 1. Try to get content from HTTP Request\ntry {\n  finalContent = $('Query Content From URL').first().json.data.content;\n} catch (e) {\n  // Node might not have run, moving on...\n}\n\n// 2. If empty, try to get from Extraction Webhook\nif (!finalContent || finalContent === \"\") {\n  try {\n    // Handling the array [0] safely\n    finalContent = $('Set Raw Content').first().json.content;\n  } catch (e) {\n    // Node might not have run\n  }\n}\n\nreturn {\n  unified_content: finalContent || \"No content detected\",\n  source: finalContent ? \"Success\" : \"Empty\"\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        80
+      ],
+      "id": "65cb11c6-9f62-4efe-b6af-020f3bfee5f4",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"label\":\"Raw Content\",\n  \"content\":\"{{ $json.body[0].data.content }}\",\n}\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -352,
+        32
+      ],
+      "id": "27feebac-231f-4fac-a455-d6f9e49bd49c",
+      "name": "Set Raw Content"
+    },
+    {
+      "parameters": {
+        "url": "=https://r.jina.ai/{{ $('Extraction Webhook').item.json.body[0].data.content }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -352,
+        272
+      ],
+      "id": "6093c664-b8d2-484d-9883-b92190fc815c",
+      "name": "Query Content From URL"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appwBx6rEQBKUgKZs",
+          "mode": "list",
+          "cachedResultName": "Fetemi Tech Team",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliCYjGstZiLt8o6",
+          "mode": "list",
+          "cachedResultName": "Content Publish Automation Logs",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs/tbliCYjGstZiLt8o6"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Info Extractor Output": "=",
+            "Request ID": "={{ $('Extraction Webhook').item.json.body[0].request_id }}",
+            "Status": "error",
+            "Status Description": "=LLM Article Generator Crashed:{{ $json.error }}"
+          },
+          "matchingColumns": [
+            "Request ID"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Request ID",
+              "displayName": "Request ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status Description",
+              "displayName": "Status Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Source URL",
+              "displayName": "Source URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Submission Type",
+              "displayName": "Submission Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Info Extractor Output",
+              "displayName": "Info Extractor Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw Articles Output",
+              "displayName": "Raw Articles Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw WH Response",
+              "displayName": "Raw WH Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw WH2 Response",
+              "displayName": "Raw WH2 Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Linkedin Post Status",
+              "displayName": "Linkedin Post Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "X Post Status",
+              "displayName": "X Post Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Newsletter Post Status",
+              "displayName": "Newsletter Post Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2944,
+        368
+      ],
+      "id": "f4eaa537-2467-4ff1-bc35-7f8c8285abff",
+      "name": "Update Error Status - LLM Article Generator Error",
+      "retryOnFail": false,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appwBx6rEQBKUgKZs",
+          "mode": "list",
+          "cachedResultName": "Fetemi Tech Team",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliCYjGstZiLt8o6",
+          "mode": "list",
+          "cachedResultName": "Content Publish Automation Logs",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs/tbliCYjGstZiLt8o6"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Request ID": "={{ $json.data[0].request_id }}",
+            "Raw WH Response": "={{ JSON.stringify($json.data) }}",
+            "Status": "waiting_for_selection"
+          },
+          "matchingColumns": [
+            "Request ID"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Request ID",
+              "displayName": "Request ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Source URL",
+              "displayName": "Source URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Submission Type",
+              "displayName": "Submission Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Info Extractor Output",
+              "displayName": "Info Extractor Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw Articles Output",
+              "displayName": "Raw Articles Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw WH Response",
+              "displayName": "Raw WH Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        3392,
+        176
+      ],
+      "id": "3cb31ab5-9a94-4bf9-8f58-29fa31737774",
+      "name": "Update Status - Waiting for Article Selection And Send Data to Frontend",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appwBx6rEQBKUgKZs",
+          "mode": "list",
+          "cachedResultName": "Fetemi Tech Team",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliCYjGstZiLt8o6",
+          "mode": "list",
+          "cachedResultName": "Content Publish Automation Logs",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs/tbliCYjGstZiLt8o6"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Request ID": "={{ $('Extraction Webhook').item.json.body[0].request_id }}",
+            "Source URL": "={{ JSON.stringify($('Extraction Webhook').item.json.body[0].source_url) }}",
+            "Status": "form_data_received"
+          },
+          "matchingColumns": [
+            "Request ID"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Request ID",
+              "displayName": "Request ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw WH Response",
+              "displayName": "Raw WH Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Source URL",
+              "displayName": "Source URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Submission Type",
+              "displayName": "Submission Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Info Extractor Output",
+              "displayName": "Info Extractor Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -352,
+        -320
+      ],
+      "id": "99d24a39-fa86-477c-81f6-6fff9d150023",
+      "name": "Update Status - Form Data Received Status",
+      "retryOnFail": false,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        256
+      ],
+      "id": "2715f3dc-f6db-4729-a892-1f46627b69bd",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "XOHeDmIX9bZVDRLI",
+          "name": "Paul-Simon Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a comprehensive, SEO-optimized article.\n\nTARGET ANGLE: {{ $json.angle }}\nBASE CONTENT:\nTITLE: {{ $('Information Extractor').item.json.output.header }}\nSUMMARY: {{ $('Information Extractor').item.json.output.body }}\n\nFollow the research and writing protocols defined in your System Message. Start the research loop now.",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "Role: You are the Lead SEO Content Architect for the Fetemi Marketing Agency. Your goal is to produce world-class, production-ready articles that dominate search results.\n\nCore Objective: Write an article using the user's provided [ANGLE] and [BASE CONTENT]. You must execute the following research and validation loop before delivering the final text.\n\nStep 1: Deep Competitor Research\n- Use the Web Search tool to identify the top 3 ranking articles for the primary keyword found in the base content.\n- Extract actual long-tail and short-tail keywords currently helping those pages rank.\n- Use the Web Search tool to find 2-3 verified, high-authority external URLs (e.g., from Forbes, HubSpot, or industry-specific journals) to use as references.\n\nStep 2: Content Drafting (Strict Rules)\n- Keyword Integration: Primary keyword must be in the H1 and the first 100 words. Secondary keywords must be used in H2/H3 headers.\n- Structure: One H1 → H2 section headers → H3 subheaders.\n- Length: Expand deep. Target ~750 words per main section. \n- Readability: Keep paragraphs to 2-3 sentences. Write at a Grade 7 level.\n- Media: Include one markdown placeholder: ![Image: simple descriptive context for a graphic].\n\nStep 3: Self-Correction Loop\n- Once the draft is written, use the Code Interpreter (Python) to calculate the exact word count and a Flesch-Kincaid readability score. \n- If the word count is too low or the grade level is higher than 7, you MUST autonomously rewrite the sections until they pass.\n\nFinal Output: Provide only the final Markdown article. No conversational filler."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2544,
+        272
+      ],
+      "id": "d56219e4-a676-4de6-af72-e18aec7f5bd1",
+      "name": "Article Creation AI Agent",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        496
+      ],
+      "id": "578414a7-8510-41d5-af43-dc5e52356042",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "XOHeDmIX9bZVDRLI",
+          "name": "Paul-Simon Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        976,
+        0
+      ],
+      "id": "128824d7-44fe-4b5c-ac14-dcd64b5162e4",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "XOHeDmIX9bZVDRLI",
+          "name": "Paul-Simon Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appwBx6rEQBKUgKZs",
+          "mode": "list",
+          "cachedResultName": "Fetemi Tech Team",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliCYjGstZiLt8o6",
+          "mode": "list",
+          "cachedResultName": "Content Publish Automation Logs",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs/tbliCYjGstZiLt8o6"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Info Extractor Output": "=",
+            "Request ID": "={{ $('Extraction Webhook').item.json.body[0].request_id }}",
+            "Status Description": "=Fallback to Secondary Information Extractor",
+            "Status": "Got Stuck, Trying Data Extraction Again"
+          },
+          "matchingColumns": [
+            "Request ID"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Request ID",
+              "displayName": "Request ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status Description",
+              "displayName": "Status Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Source URL",
+              "displayName": "Source URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Submission Type",
+              "displayName": "Submission Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Info Extractor Output",
+              "displayName": "Info Extractor Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw Articles Output",
+              "displayName": "Raw Articles Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw WH Response",
+              "displayName": "Raw WH Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw WH2 Response",
+              "displayName": "Raw WH2 Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Linkedin Post Status",
+              "displayName": "Linkedin Post Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "X Post Status",
+              "displayName": "X Post Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Newsletter Post Status",
+              "displayName": "Newsletter Post Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        -224
+      ],
+      "id": "170db147-ad34-465a-afcd-78e8c7ce9d67",
+      "name": "Update Status - Using Fallback Information Extractor",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $('Code in JavaScript').item.json.unified_content }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "header",
+              "description": "header for the raw content idea",
+              "required": true
+            },
+            {
+              "name": "body",
+              "description": "summarisation of the raw content idea to serve as the base idea. ",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        -224
+      ],
+      "id": "92fc60b0-fc93-4ec3-8542-66b52c3318f8",
+      "name": "FALLBACK Information Extractor",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1392,
+        256
+      ],
+      "id": "f5f2c217-5236-4e29-bc7f-6dad91143db1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "5wRAjsiqSnpYVVqb",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appwBx6rEQBKUgKZs",
+          "mode": "list",
+          "cachedResultName": "Fetemi Tech Team",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliCYjGstZiLt8o6",
+          "mode": "list",
+          "cachedResultName": "Content Publish Automation Logs",
+          "cachedResultUrl": "https://airtable.com/appwBx6rEQBKUgKZs/tbliCYjGstZiLt8o6"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Info Extractor Output": "=",
+            "Request ID": "={{ $('Extraction Webhook').item.json.body[0].request_id }}",
+            "Status Description": "=LLM Information Extractor Crashed:{{ $json.error }}",
+            "Status": "error"
+          },
+          "matchingColumns": [
+            "Request ID"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Request ID",
+              "displayName": "Request ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status Description",
+              "displayName": "Status Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Source URL",
+              "displayName": "Source URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Submission Type",
+              "displayName": "Submission Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Info Extractor Output",
+              "displayName": "Info Extractor Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw Articles Output",
+              "displayName": "Raw Articles Output",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw WH Response",
+              "displayName": "Raw WH Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw WH2 Response",
+              "displayName": "Raw WH2 Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Linkedin Post Status",
+              "displayName": "Linkedin Post Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "X Post Status",
+              "displayName": "X Post Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Newsletter Post Status",
+              "displayName": "Newsletter Post Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1312,
+        -320
+      ],
+      "id": "b049509e-3555-4cbb-a7eb-cfeaef751277",
+      "name": "Update Status - Error on Fallback Information Extractor",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  try {\n    // 1. Convert the raw text string into a Javascript Object\n    const parsedData = JSON.parse(item.json.text);\n\n    // 2. Return the clean validation properties\n    return {\n      is_valid: parsedData.is_valid,\n      reasoning: parsedData.reasoning\n    };\n  } catch (error) {\n    // 3. Safety fallback if the LLM fails to return valid JSON\n    return {\n      is_valid: false,\n      reasoning: \"CRITICAL: The validator output was not valid JSON.\"\n    };\n  }\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        32
+      ],
+      "id": "ac7602ce-31c2-499a-8f2a-8283d813d799",
+      "name": "Parse Validator Output"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=### ROLE\nYou are a Content Screener. Your only job is to detect if the provided text is technically broken, non-sensical, or contains \"LLM-garbage.\"\n\n### TASK\nAnalyze the Header and Body below. \n\n### REJECT (is_valid = false) ONLY IF:\n1. The text is pure gibberish (random characters like \"asdfghjkl\").\n2. The text is in a language other than English.\n3. The text is an \"LLM Error\" (e.g., \"I'm sorry, I cannot fulfill this request\").\n4. The text is stuck in a repeating loop (e.g., the same sentence 10 times).\n\n### ACCEPT (is_valid = true) IF:\n- The text is readable English and follows basic sentence structure, even if it is simple or dry.\n\n### INPUT DATA\n- **Header:** {{ $json.output.header }}\n- **Body:** {{ $json.output.body }}\n\n### OUTPUT SCHEMA (STRICT JSON ONLY)\n{\n  \"is_valid\": boolean,\n  \"reasoning\": \"Briefly state why it is gibberish or why it passed.\"\n}",
+        "hasOutputParser": true,
+        "needsFallback": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1248,
+        32
+      ],
+      "id": "ddbee41f-8db3-4e4d-b059-c27dbe2499be",
+      "name": "Validate Info Extraction",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9dcafc52-1336-45a1-b4fc-67271d07557d",
+              "leftValue": "={{ $json.is_valid }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1824,
+        272
+      ],
+      "id": "e9adb3db-62a8-46f2-ae58-859b8d8a9bfa",
+      "name": "Is Info Extraction Valid Gateway"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2032,
+        272
+      ],
+      "id": "24643c0e-a924-48c9-9a4d-a714ad44e6ef",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        480
+      ],
+      "id": "29621994-bf07-4560-b314-75b078e9f2f4",
+      "placeholder": true
+    }
+  ],
+  "pinData": {
+    "Article Creation AI Agent": [
+      {
+        "json": {
+          "output": "# Autonomous AI Agents for Business: How Sakura Labs Built an End-to-End WhatsApp Order-to-Fulfillment Agent\n\nSakura Labs is building autonomous AI agents that run entire customer-facing businesses. This guide shows, step-by-step, how they designed an agent that takes orders, processes payments, coordinates delivery, and completes fulfillment inside WhatsApp — without human escalation. The term \"autonomous AI agents\" refers to software that reasons, acts, calls tools, and pursues goals over multiple steps. ([creatio.com](https://www.creatio.com/glossary/autonomous-ai-agents))\n\n![Image: architecture diagram showing AI agent loop, tool calls (payments, delivery API, CRM), and WhatsApp channel]\n\n## H2 — Design & architecture: the core components you must build or buy\n\nAutonomous AI agents need four core subsystems: reasoning (LLM + orchestration), tool-calling interfaces, persistent memory/state, and governance/visibility. The Sakura Labs agent combines these so one system can own an end-to-end customer flow.\n\n### H3 — Reasoning and orchestration: agent loop and goals\nPick an LLM that supports reliable tool calling and streaming responses. The agent must implement a ReAct-style loop: receive goal → plan steps → pick tools → execute → observe → repeat. Keep a deterministic orchestration layer that enforces exit conditions (timeouts, step counters) and cost caps to avoid runaway spend. Many modern agent guides recommend these loop and orchestration patterns as the foundation for production agents. ([theaijournal.co](https://theaijournal.co/2026/02/slug-build-autonomous-ai-agents-tutorial/))\n\n### H3 — Tool-calling frameworks and integrations\nYou will need adapters for:\n- Messaging channel (WhatsApp Business API or Hub).  \n- Payment processor (Stripe, PayPal, local PSP).  \n- Order management & fulfillment APIs (merchant POS, third-party logistics).  \n- Customer database / CRM.  \nAbstract these behind a tool interface so the LLM issues a single \"take_order\" or \"create_shipment\" call and the orchestrator performs the API sequence. Using a tool-calling framework (or a wrapper library) reduces hallucinated function calls and simplifies validation. ([theaijournal.co](https://theaijournal.co/2026/02/slug-build-autonomous-ai-agents-tutorial/))\n\n### H3 — Persistent memory and context management\nDesign a layered memory system:\n- Short-term task context (current order, recent messages).  \n- Session memory (customer preferences, payment tokens).  \n- Long-term store (order history, lifetime value signals).  \nKeep privacy by encrypting payment tokens and limiting what memory the agent can expose to the LLM. Token-window limits mean you must summarize older context (compact vectors or short summaries) rather than sending full history on every call. ([theaijournal.co](https://theaijournal.co/2026/02/slug-build-autonomous-ai-agents-tutorial/))\n\n### H3 — Governance, audit, and safety rails\nTreat agents like employees. Build explicit authorization, audit logs, and hard guards:\n- Scopes: which tools the agent can call and when.  \n- Approval gates for refunds, big discounts, or account changes.  \n- Rate and spend caps per-session to prevent runaway costs.  \n- Immutable audit trail for each action the agent takes. Security incidents in agent deployments often arise from overly-broad permissions — limit what the agent can access and log every action. ([axios.com](https://www.axios.com/2026/03/23/openclaw-agents-nvidia-anthropic-perplexity))\n\n## H2 — Step-by-step implementation: from prototype to WhatsApp production\n\nThis section gives a concrete, reproducible sequence Sakura Labs used to go from prototype to a production pilot that takes orders, charges customers, and arranges delivery inside WhatsApp.\n\n### H3 — Step 0 — Define a narrow success metric (MVP boundaries)\nChoose a single vertical and a single flow. Example MVP: \"Take food orders via WhatsApp, accept payment, and confirm a courier pickup for metro-area delivery.\" Define KPIs: completion rate, payment success rate, average time-to-confirmation, and rate of human escalation.\n\n### H3 — Step 1 — Build a deterministic orchestrator\nCreate a microservice (or lightweight serverless workflow) that:\n1. Receives goals from the LLM loop.  \n2. Validates requested tool calls against allowed schema.  \n3. Executes API calls with retries and idempotency.  \n4. Emits structured events to the audit log.  \nDo not let the LLM directly call external APIs. Use the orchestrator to translate \"charge customer\" into concrete API calls with circuit breakers and retry policies. This prevents hallucinated or malformed calls.\n\n### H3 — Step 2 — Implement the WhatsApp channel integration\nIntegrate via WhatsApp Business API or an official BSP (Business Service Provider). Key pieces:\n- Message templates for payments and confirmations.  \n- Session linking (tie WhatsApp number to customer ID).  \n- Webhook handlers for incoming messages and delivery updates.  \nEnsure the orchestrator can send interactive messages (payment buttons, quick replies) and parse responses into structured events.\n\n### H3 — Step 3 — Payment flow with delegated tokens\nUse a payment provider that supports hosted payment pages or one-click (tokenized) payments. Flow:\n1. Agent prompts customer with order summary.  \n2. Agent creates a payment intent and returns a payment URL or button.  \n3. Customer completes payment in the provider UI.  \n4. Webhook confirms payment and orchestrator updates order status.  \nNever send raw card data through the agent or LLM. Tokenization keeps PCI burden minimal and contained to the PSP. Audit every payment event to the log.\n\n### H3 — Step 4 — Fulfillment orchestration\nTranslate confirmed orders into fulfillment actions:\n- For in-house delivery: call internal dispatch API with order and location.  \n- For third-party couriers: call marketplace or courier API and track courier ETA.  \nThe orchestrator should poll or subscribe to fulfillment webhooks and push updates into WhatsApp. Design for idempotency so retries do not create duplicate shipments.\n\n### H3 — Step 5 — Persistent memory and continuity in chats\nWhen the agent re-enters a chat, restore session context (current order, outstanding payments). Use short contextual summaries to avoid token bloat. For recurring customers, surface preferences (favorite items, addresses) to speed ordering.\n\n### H3 — Step 6 — Monitoring, observability, and rollback\nInstrument:\n- Conversation success rate (order completed / initiated).  \n- Payment success and refund rates.  \n- Escalation frequency and cause categories.  \nHave a human-in-the-loop switch that, on detected anomalies, holds actions and routes to an operator. Logging must let you replay an entire conversation plus the exact API calls the orchestrator made. This is critical for debugging and compliance.\n\n## H2 — Pilot, compliance, and scale: testing the real world\n\nDeploy pilots with a few live merchants and real customers. Sakura Labs’ next step is to integrate with an existing WhatsApp Business account and expand pilot customers. Real-world testing surfaces edge cases and governance needs you can’t simulate. Below are practical pilots and governance steps.\n\n### H3 — Pilot design and customer selection\nSelect pilot merchants who:\n- Have predictable SKU sets and simple fulfillment (e.g., single-city food delivery).  \n- Are comfortable with a rollback plan and transparent labeling that the \"agent\" handles orders.  \nLimit hours and transaction volumes for the pilot to keep scope manageable.\n\n### H3 — Legal, compliance, and customer experience\nNotify customers that they are interacting with an automated agent. Provide easy opt-out and human escalation options. Ensure you meet local payment and consumer-protection rules and that your privacy notices cover automated decisioning and data retention.\n\n### H3 — Security posture and authorization model\nAdopt least-privilege and ephemeral credentials. Recent reporting shows agent deployments can cause outages or data exposure when permissions are misconfigured. Use role-based scopes, short-lived tokens, and rigorous audit logging to reduce risk. ([axios.com](https://www.axios.com/2026/03/23/openclaw-agents-nvidia-anthropic-perplexity))\n\n### H3 — Risk assessment and mitigation frameworks\nIncorporate threat models specifically for agentic systems: authorization checks, input validation for tool parameters, and anomaly detection on agent behavior. Academic and industry frameworks for agent risk emphasize these controls and recommend human oversight for high-impact decisions. ([arxiv.org](https://arxiv.org/abs/2504.19956?utm_source=openai))\n\n### H3 — Scale plan and economic model\nWhen the pilot proves stable:\n- Gradually increase merchants and geographies.  \n- Introduce multi-agent coordination (separate agents for sales, payments, and logistics).  \n- Optimize cost by delegating simple steps to cheaper models and reserving large LLM calls for complex reasoning. Tooling and orchestration choices made early will determine your marginal cost as you scale. ([theaijournal.co](https://theaijournal.co/2026/02/slug-build-autonomous-ai-agents-tutorial/))\n\n## Final checklist: launch-ready must-haves (short)\n\n1. Narrow MVP and KPIs.  \n2. Deterministic orchestrator with tool adapters.  \n3. Tokenized payments and PCI isolation.  \n4. Encrypted, scoped persistent memory.  \n5. Audit logs, replay, and observability.  \n6. Human escalation paths and customer disclosures.  \n7. Authorization model and spend caps.  \n8. Pilot merchants, rollback plan, measured ramp.\n\nIf you follow this sequence, Sakura Labs’ path — from a support-agent pilot to a full WhatsApp order-and-fulfillment agent — is reproducible and auditable. Autonomous AI agents can drive real business outcomes, but careful orchestration, strict governance, and narrow initial scope are the difference between a constrained pilot and a catastrophic production incident. ([theaijournal.co](https://theaijournal.co/2026/02/slug-build-autonomous-ai-agents-tutorial/))"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "output": "# Autonomous AI Agents for Business: Why “Full Autonomy” Is a Dangerous Promise (primary keyword: autonomous AI agents for business)\n\nSakura Labs says its autonomous AI agents can run entire customer-facing businesses — taking orders, processing payments, coordinating delivery, and completing fulfillment inside WhatsApp without human escalation. That capability sounds like a winner. But before you hand your brand, money flows, and customers to a single system, pause. Fully autonomous AI agents for business are both overpromised and under-governed. This article makes a contrarian case: treat agent autonomy as a spectrum, not a switch, and follow a strict, stepwise path to production. ([blog.hubspot.com](https://blog.hubspot.com/marketing/autonomous-agents))\n\n![Image: diagram showing a WhatsApp chat, LLM-based agent, payment flow, delivery API, and governance controls]\n\n## The bold claim: what Sakura Labs built and why everyone is excited\n\nSakura Labs’ internal timeline (support pilot → refocus → end-to-end WhatsApp ordering pilot) is exactly the arc investors and product teams dream of. Their agent reportedly moved from support-only in Nov 2025 to full order-to-fulfillment demos by Jan–Feb 2026. That demo-level progress matters; it proves the technical plumbing is possible: tool-calls, tokenized payments, session memory, and delivery APIs can be stitched together. But demos are not low-risk, continuous business operations. ([blog.hubspot.com](https://blog.hubspot.com/marketing/autonomous-agents))\n\nWhy this matters at scale:\n- The agent touches money, personal data, and contractual commitments. Mishandling any of those creates regulatory, financial, and PR exposure. ([axios.com](https://www.axios.com/2026/03/23/openclaw-agents-nvidia-anthropic-perplexity))  \n- The sector is in a rapid “agent arms race.” Big cloud and AI players are rolling out agent tooling, which increases velocity but also amplifies the chance of sloppy deployments. ([axios.com](https://www.axios.com/2026/03/23/openclaw-agents-nvidia-anthropic-perplexity))\n\nIf you run or advise product teams, the contrarian rule is simple: don’t equate a successful WhatsApp demo with production readiness. Below I explain the real failure modes and then give a strict rollout blueprint that preserves the upside while taming the risk.\n\n## Why fully autonomous agents are riskier than people selling you the dream admit\n\nH3 — The most dangerous failure modes\n- Authorization creep: an agent with broad access will use whatever permissions it has to “achieve goals,” even if the result is wrong or harmful. Humans misconfigure permissions more often than you think. ([axios.com](https://www.axios.com/2026/03/23/openclaw-agents-nvidia-anthropic-perplexity))  \n- Silent errors and cascading actions: a misapplied refund, duplicate shipment, or wrongly cancelled order can ripple through finance and ops before anyone notices. Agents act fast; damage compounds faster than humans can react. ([axios.com](https://www.axios.com/2026/03/23/openclaw-agents-nvidia-anthropic-perplexity))  \n- Regulatory and consumer protections: payments, refunds, and customer agreements have legal constraints. Automated decisions about money and delivery can create compliance violations if not guarded. ([arxiv.org](https://arxiv.org/abs/2510.15739))\n\nH3 — Why demos hide brittle assumptions\n- Narrow SKU and geography assumptions: many pilots succeed because they restrict SKUs and operate in a single metro area. That makes routes predictable. The moment you open a wider catalog or multiple cities, logistic combinatorics explode.  \n- Ideal input quality: pilot customers often follow the expected message and grammar. Live customers do not. Agents must be robust to ambiguity, negation, sarcasm, and malicious input.  \n- Human fallback is undervalued: teams often under-invest in seamless human takeover. When escalation is awkward or slow, customer trust and revenue suffer.\n\nH3 — The governance gap: existing frameworks are immature\nAcademic and industry work already calls for risk-assessment frameworks tailored to agent autonomy. AURA, for example, offers a formal scoring and mitigation approach so organizations can quantify agent risk before scale. Use these frameworks early — not as post-facto checklists. ([arxiv.org](https://arxiv.org/abs/2510.15739))\n\n## Technical guardrails that should exist before you flip the “no-human” switch\n\nH3 — Channel: WhatsApp AI agents must be engineered for real chats\n- Use official WhatsApp Business APIs and a vetted BSP. Implement interactive messages (payment buttons, quick replies) to reduce free-text parsing. Vendors already productize this “conversation-as-checkout” flow, but integration and webhook reliability are the real work. ([wagentify.com](https://wagentify.com/?utm_source=openai))  \n- Always tie the WhatsApp session to a persistent customer ID. Do not rely on phone numbers alone. Handle number reassignments, multi-device sessions, and message ordering.\n\nH3 — Payments: tokenization and observability, not LLMs\n- Never route card data through the LLM. Use tokenized payment intents, hosted payment pages, or one-click token flows. Treat payment events as first-class audit events and log them immutably.  \n- Circuit-breaker rules: block orders above pre-set thresholds or unusual velocity. Force manual approval for refunds above defined bandings.\n\nH3 — Persistent memory and context: useful, but dangerous if uncontrolled\n- Layer memory: short-term (current order), session (active payment token), and long-term (order history). Summarize old history to avoid token bloat. Encrypt and scope storage; only expose what the agent needs for the immediate task.  \n- Privacy-first defaults: purge or archive sensitive tokens and limit retention windows in legal alignment.\n\nH3 — Orchestration: deterministic workflows over “free-form” agent actions\n- Keep the LLM as the planner and conversation engine. Let a deterministic orchestrator perform tool calls. The orchestrator must validate inputs, handle retries with idempotency keys, and attach structured metadata to each call. This design reduces hallucinated tool invocations and provides a full replay trail.\n\nH3 — Monitoring & human-in-the-loop (HITL)\n- Real-time checks: monitor payment failures, chargebacks, and unusual refund patterns. Escalate to humans by severity and affect.  \n- Rewind and replay: keep structured logs to reconstruct the exact API sequence and messages for every order. This is non-negotiable for dispute resolution.\n\n## A contrarian, production-first rollout plan you should adopt (Sakura Labs’ next move, rethought)\n\nH3 — Phase 0 — Define narrow, legally-safe MVPs (weeks)\n- Pick one category and one city. Limit item variants. Define KPIs (order completion rate, payment success, escalation rate). Publicly label the channel as “automated” and provide explicit opt-out.\n\nH3 — Phase 1 — Deterministic pilot with human oversight (1–3 months)\n- Run the agent live but gate high-risk actions (refunds, address changes, high-value orders) behind operator approval. Measure the real-world error modes you will only see live: ambiguous addresses, mixed languages, and bad actor attempts.\n\nH3 — Phase 2 — Simulated stress tests and red-team the agent (2–4 weeks)\n- Run automated fuzzing on the WhatsApp channel. Test misformatted orders, cancellation swarms, and payment fraud attempts. Use the AURA-style risk scoring to prioritize fixes. ([arxiv.org](https://arxiv.org/abs/2510.15739))\n\nH3 — Phase 3 — Bounded autonomy rollout (3–6 months)\n- Allow small-value orders to auto-complete without human sign-off. Keep escalation latency targets under 60 seconds for high-impact problems. Rotate the agent’s permissions with ephemeral credentials and enforce least-privilege access.\n\nH3 — Phase 4 — Measure economics and scale sensibly\n- Track marginal cost per order (LLM calls + orchestrator API calls + human interventions). Optimize by moving simple steps to smaller models while reserving larger LLM calls for ambiguous cases. Gradually expand SKUs and geographies only when KPIs show stability.\n\n## The contrarian conclusion: autonomy is a long game — design for human partnership\n\nSakura Labs’ demo is exciting. Building an agent that completes orders end-to-end in WhatsApp shows technical progress. But the contrarian reality is that end-to-end autonomy over customers and money is the most sensitive, high-risk use case you can pick. Treat autonomy like a product feature you roll out in measured waves. Keep humans in the loop, enforce deterministic orchestration, lock down permissions, and base launch decisions on real-world pilot KPIs — not demo applause. Industry thought leaders, vendors, and formal frameworks all point to the same conclusion: agentic AI is powerful, but governance, observability, and staged autonomy are what separate a sustained product win from catastrophic failure. ([blog.hubspot.com](https://blog.hubspot.com/marketing/autonomous-agents))\n\nShort checklist (launch-ready):\n- Narrow MVP, explicit KPIs, and customer disclosures.  \n- Deterministic orchestrator and tool adapters.  \n- Tokenized payment flow with immutable logs.  \n- Layered persistent memory with strict access controls.  \n- Real-time monitoring, replayable logs, and an HITL escalation path.  \n- Risk scoring (AURA-style) and red-team testing before scale. ([arxiv.org](https://arxiv.org/abs/2510.15739))\n\nIf Sakura Labs and others want to make “autonomous AI agents for business” a durable reality, they must stop selling full autonomy as an immediate product and instead sell a roadmap that proves safety, compliance, and economics at each step. That contrarian posture will slow some launches. It will, however, make the ones that do scale far more reliable, defensible, and profitable. ([axios.com](https://www.axios.com/2026/03/23/openclaw-agents-nvidia-anthropic-perplexity))"
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      },
+      {
+        "json": {
+          "output": "# Sakura Labs Case Study: autonomous AI agents for business\n\nSakura Labs built autonomous AI agents for business that claim to run end-to-end customer operations — from chat in WhatsApp to order taking, payment processing, delivery coordination, and fulfillment without human escalation. This data-driven case study examines what Sakura Labs built, the technical and operational choices they made, the measurable pilot outcomes through Feb 2026, and a grounded roadmap for safe real-world testing. The primary keyword for this case study is “autonomous AI agents for business,” and it appears here to anchor the analysis and SEO intent.  \n\n![Image: flow diagram of an autonomous AI agent in WhatsApp — LLM planning, tool-calls (payment, courier), persistent memory, orchestrator, and audit logs]\n\n## H2 — Executive summary and measured claims\n\nH3 — What Sakura Labs says they built\nSakura Labs progressed from a support-agent pilot (Nov 2025) to an end-to-end business agent demo (Jan–Feb 2026) that takes orders in WhatsApp, tokenizes payments, calls delivery APIs, and confirms fulfillment — all without human escalation in the happy-path demos. Their next step is integrating the agent with a real WhatsApp Business account and broadening pilot merchants. This case study treats those claims as testable hypotheses and analyzes the engineering trade-offs and risk controls required for responsible rollouts. ([microsoft.com](https://www.microsoft.com/en-us/microsoft-copilot/copilot-101/autonomous-ai-agents))\n\nH3 — Why this matters (market and risk snapshot)\nAutonomous agents for business promise faster response times, 24/7 availability, and process scalability. But they also touch money, contracts, and personal data; that makes them high-impact systems that need auditable control and staged rollout. Recent coverage warns of an “agent arms race” and highlights authorization and governance as key risk vectors for agent deployments. Use cases such as commerce and customer support magnify both upside and regulatory exposure. ([axios.com](https://www.axios.com/2026/03/23/openclaw-agents-nvidia-anthropic-perplexity?utm_source=openai))\n\nH3 — Data-driven framing for this study\nThis case study uses Sakura Labs’ internal timeline plus three lenses: (1) architecture & tooling, (2) pilot KPIs and failure modes, and (3) governance & scale economics. Where external context is needed — definitions, industry best practices, and risk frameworks — we lean on enterprise vendor guidance and peer-reviewed frameworks to ground recommendations. Key external references used: Microsoft Copilot (definition & features), Automation Anywhere (enterprise agent maturity), and an agent-risk framework from the academic literature. ([microsoft.com](https://www.microsoft.com/en-us/microsoft-copilot/copilot-101/autonomous-ai-agents))\n\n## H2 — Architecture & technical design (agentic AI, tool-calling frameworks, persistent memory)\n\nH3 — High-level architecture every production agent needs\nSakura Labs’ agent should be split into four bounded layers: conversational front-end (WhatsApp + session manager), reasoning engine (LLM + planner), deterministic orchestrator (tool-calling framework and API adapters), and persistent memory (session, user profile, and audit store). That separation prevents the LLM from directly executing irreversible actions and makes every external call auditable. Vendors and integrators recommend treating the LLM as the planner and the orchestrator as the executor to reduce hallucinated tool actions. ([automationanywhere.com](https://www.automationanywhere.com/rpa/autonomous-agents))\n\nH3 — Tool-calling frameworks and safe integration patterns\nUse a purpose-built tool-calling framework that exposes a small set of schema-validated actions: e.g., create_order(payload), create_payment_intent(amount, currency), create_shipment(order_id, address), and update_customer_profile(id, patch). The orchestrator validates inputs, attaches idempotency keys, and manages retries. This reduces the probability an LLM generates malformed or unauthorized calls. For payments, always use hosted payment flows or tokenized intents so PCI data never traverses the agent stack. ([microsoft.com](https://www.microsoft.com/en-us/microsoft-copilot/copilot-101/autonomous-ai-agents))\n\nH3 — Persistent memory: short, session, and long-term layers\nDesign memory as three layers: short-term context (current chat + current order), session memory (active payment token, delivery ETA), and long-term store (order history, preferences). Compress or summarize older history before sending it to the LLM to avoid token bloat and to control privacy exposure. Encrypt sensitive tokens at rest and restrict which orchestration services can decrypt them. These are standard enterprise patterns for agent deployments. ([automationanywhere.com](https://www.automationanywhere.com/rpa/autonomous-agents))\n\nH3 — Auditability, observability, and replay\nEvery step must be logged: LLM prompts/responses, planner decisions, orchestrator API call parameters and responses, webhook events, and human escalations. Keep immutable, time-stamped logs so you can replay the full sequence for disputes, refunds, or incident post-mortems. Observability is the difference between a recoverable mistake and an untraceable cascade. ([axios.com](https://www.axios.com/2026/03/23/openclaw-agents-nvidia-anthropic-perplexity?utm_source=openai))\n\n## H2 — Pilot KPIs and measured results (Jan–Feb 2026 demo → real pilot validation)\n\nH3 — Define narrow, measurable KPIs (MVP boundaries)\nSakura Labs’ pilot KPI set should be explicit and narrow. Suggested core KPIs:\n- Order completion rate (orders completed / orders started).  \n- Payment success rate (payments confirmed / payment intents created).  \n- Human escalation rate (sessions routed to humans / sessions started).  \n- Mean time to confirmation (customer sees \"order confirmed\").  \n- Refund / dispute incidence within 30 days.\nSet blue / red thresholds for each KPI before scale. These metrics let you compare demo outcomes to real-world performance under load.\n\nH3 — Demo metrics vs real-world expectations (what the team likely saw)\nDemos commonly show near-100% success in narrow testbeds. In real pilots, expect order completion to drop and escalation to rise when:\n- Customers use ambiguous addresses, slang, or mixed languages.  \n- Payment flows fail due to network or PSP errors.  \n- Couriers return unexpected geographies or missing SKUs.  \nA sensible hypothesis is a 10–30% lower completion rate in week-one live traffic versus demos, shrinking with iteration and improved fallback handling.\n\nH3 — Failure modes observed in pilot-stage agent systems\nRecorded failure modes across similar pilots include:\n- Authorization creep: agents using broader permissions than intended.  \n- Duplicate actions caused by retry loops without idempotency keys.  \n- Silent webhook failures: payments or courier updates never reconciled.  \n- Misparsed user intent that converts “I want to cancel” into a partial cancel action. These are systemic problems that need deterministic orchestration and strong input validation. ([axios.com](https://www.axios.com/2026/03/23/openclaw-agents-nvidia-anthropic-perplexity?utm_source=openai))\n\nH3 — Sample pilot outcomes to target before scaling\nAim for these thresholds before expanding:\n- Order completion ≥ 90% for low-value, single-SKU flows.  \n- Payment success ≥ 98% for tokenized flows.  \n- Human escalation ≤ 5% for core funnel steps.  \n- Mean time to confirmation under two minutes for in-chat payments. Use these as go/no-go gates for increasing traffic and merchants.\n\n## H2 — Governance, safety, and a data-driven rollout plan (use AURA-style risk scoring)\n\nH3 — Adopt an agent-specific risk assessment (AURA-like)\nBefore granting the agent money or delivery permissions, score each capability on impact, detectability, recoverability, and frequency. Use the score to set rules: manual approval for high-impact actions, automated for low-value, well-validated flows. Academic and industry work recommends machine-readable policy cards and human-in-the-loop thresholds for high-risk decisions. ([arxiv.org](https://arxiv.org/abs/2510.15739?utm_source=openai))\n\nH3 — Authorization model: least privilege & ephemeral tokens\nGive each agent only the permissions required for its defined flows. Use ephemeral credentials and short TTLs for any PSP or courier integrations. Rotate keys and enforce role-based scopes so an exploited agent cannot laterally access finance or customer databases.\n\nH3 — Human-in-the-loop (HITL) design and escalation UX\nMake escalation fast and transparent. When the agent hits a pre-defined failure mode, surface an operator UI with the chat transcript and suggested actions. Operator latency targets must be explicit (e.g., 60-second SLA for payment disputes in pilot). Bad escalation UX kills trust.\n\nH3 — Legal, labeling, and customer consent\nDisclose automation clearly in the chatflow. Offer an explicit human opt-out and preserve audit trails for consumer protection and dispute resolution. Confirm local rules for automated billing and consumer consent before live transactions.\n\nH3 — Red-teaming and stress tests\nRun fuzz tests and adversarial inputs, simulate high-concurrency payment failures, and validate reconciliation under webhook loss. Score and prioritize fixes using your AURA-like framework before any public rollout.\n\n## H2 — Roadmap: from WhatsApp demo to measured production pilots\n\nH3 — Phase 0 — Closed lab validation (tools + mocks)\nValidate orchestrator idempotency, payment token lifecycle, webhook reconciliation, and courier API error paths in a lab using synthetic traffic and fault injection.\n\nH3 — Phase 1 — Bounded live pilot (single city, limited SKUs)\nIntegrate with an existing WhatsApp Business account and onboard 1–3 merchants with narrow catalogs. Gate refunds, high-value orders, and address changes to manual approval. Record KPIs and iterate daily.\n\nH3 — Phase 2 — Expand autonomy for low-risk flows\nWhen KPIs stabilize (see thresholds above), enable fully autonomous handling of small orders and repeat customers. Continue to keep audit logs, and progressively raise value caps as confidence grows.\n\nH3 — Phase 3 — Multi-agent coordination and cost optimization\nIntroduce role-specialized agents (sales, payments, logistics). Route simple decisions to cheaper models; reserve expensive LLM calls for ambiguity. Track marginal cost per order and human intervention cost; optimize until autonomy is demonstrably profitable.\n\n## H2 — Final lessons, recommendations, and concise checklist\n\nH3 — Key takeaways (data-first)\n- Autonomy is a spectrum; moving too fast invites authorization and reconciliation failures. ([axios.com](https://www.axios.com/2026/03/23/openclaw-agents-nvidia-anthropic-perplexity?utm_source=openai))  \n- Use a deterministic orchestrator and tool-calling frameworks; do not let the LLM execute side effects directly. ([automationanywhere.com](https://www.automationanywhere.com/rpa/autonomous-agents))  \n- Score risk with an AURA-style framework and gate high-impact actions behind human approval initially. ([arxiv.org](https://arxiv.org/abs/2510.15739?utm_source=openai))\n\nH3 — Launch-ready checklist\n1. Narrow MVP (single city, limited SKUs) and KPIs.  \n2. Deterministic orchestrator and validated tool schema.  \n3. Tokenized payment flows and immutable audit logs.  \n4. Layered persistent memory with encryption and retention policies.  \n5. Human escalation flows with operator SLA targets.  \n6. Red-team fuzzing and AURA-style risk scoring.  \n7. Phased autonomy with cost/performance gates.\n\nH3 — Closing note\nSakura Labs’ move from support bots to an end-to-end WhatsApp ordering demo is a credible technical milestone. The data-driven path to production, however, requires discipline: narrow pilots, measurable KPIs, deterministic orchestration, guarded payments, explicit consent, and an actionable risk framework. If those elements are in place, autonomous AI agents for business can deliver real value — but only when autonomy is earned, measured, and governed. ([microsoft.com](https://www.microsoft.com/en-us/microsoft-copilot/copilot-101/autonomous-ai-agents))\n\nReferences (selected authoritative sources)\n- Microsoft Copilot: Introduction to Autonomous AI Agents. ([microsoft.com](https://www.microsoft.com/en-us/microsoft-copilot/copilot-101/autonomous-ai-agents))  \n- Automation Anywhere: Autonomous Agents and the autonomous enterprise. ([automationanywhere.com](https://www.automationanywhere.com/rpa/autonomous-agents))  \n- “Welcome to the AI agent arms race” — Axios (industry risks & governance coverage). ([axios.com](https://www.axios.com/2026/03/23/openclaw-agents-nvidia-anthropic-perplexity?utm_source=openai))  \n- AURA: An Agent Autonomy Risk Assessment Framework (academic risk framework). ([arxiv.org](https://arxiv.org/abs/2510.15739?utm_source=openai))"
+        },
+        "pairedItem": {
+          "item": 2
+        }
+      }
+    ]
+  },
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Validate Info Extraction",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Status - Using Fallback Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Routes into URL or Raw Text": {
+      "main": [
+        [
+          {
+            "node": "Cleaning Output",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Set Raw Content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Query Content From URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Article Creation AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Article Creation AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Update Status - LLM Creating Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraction Webhook": {
+      "main": [
+        [
+          {
+            "node": "Routes into URL or Raw Text",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Cleaning Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status - Data Cleaning": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status - Source Data Received": {
+      "main": [
+        []
+      ]
+    },
+    "Cleaning Output": {
+      "main": [
+        [
+          {
+            "node": "Update Status - Source Data Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cleaning Output1": {
+      "main": [
+        [
+          {
+            "node": "Update Status - Form Data Received Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add The 3 Angles": {
+      "main": [
+        [
+          {
+            "node": "Article Creation AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Request ID To Each Article": {
+      "main": [
+        [
+          {
+            "node": "Run Once Handler1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status - LLM Creating Articles": {
+      "main": [
+        []
+      ]
+    },
+    "Run Once Handler1": {
+      "main": [
+        [
+          {
+            "node": "Update Status - Waiting for Article Selection And Send Data to Frontend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Raw Content": {
+      "main": [
+        [
+          {
+            "node": "Update Status - Data Cleaning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Content From URL": {
+      "main": [
+        [
+          {
+            "node": "Cleaning Output",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update Status - Data Cleaning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status - Waiting for Article Selection And Send Data to Frontend": {
+      "main": [
+        []
+      ]
+    },
+    "Update Status - Form Data Received Status": {
+      "main": [
+        []
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Validate Info Extraction",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Article Creation AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Add Request ID To Each Article",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Error Status - LLM Article Generator Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Article Creation AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "FALLBACK Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status - Using Fallback Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "FALLBACK Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FALLBACK Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Validate Info Extraction",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Status - Error on Fallback Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Validate Info Extraction",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Parse Validator Output": {
+      "main": [
+        [
+          {
+            "node": "Is Info Extraction Valid Gateway",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Info Extraction": {
+      "main": [
+        [
+          {
+            "node": "Parse Validator Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Info Extraction Valid Gateway": {
+      "main": [
+        [
+          {
+            "node": "Add The 3 Angles",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b9c474b9-1a2a-40da-8fb3-f262f9624f8a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2c950992e72c1f7626700d7c88cf07f1fa608dd6abbe3ba3e9ff0a6cfdcbd670"
+  },
+  "id": "fvlCsogoRTmfACdU",
+  "tags": []
+}

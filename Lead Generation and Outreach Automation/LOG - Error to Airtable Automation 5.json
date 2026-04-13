@@ -1,0 +1,481 @@
+{
+  "name": "LOG - Error to Airtable Automation 5",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 0],
+      "id": "e88490d5-a3c4-49f0-9bdf-670eedf49406",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\n// Safely extract each field with fallbacks\nconst step = String(input.step || 'Unknown Step').substring(0, 200);\nconst errorMessage = String(input.errorMessage || 'No error message provided').substring(0, 500);\nconst errorCode = input.errorCode ? Number(input.errorCode) : null;\nconst leadRecordId = input.leadRecordId || null;\nconst severity = ['Warning', 'Error', 'Critical'].includes(input.severity) \n  ? input.severity \n  : 'Error';\n\n// Serialize rawPayload safely — cap at 5000 chars to stay inside Airtable limits\nlet rawPayload = '';\ntry {\n  rawPayload = JSON.stringify(input.rawPayload || input, null, 2).substring(0, 5000);\n} catch(e) {\n  rawPayload = String(input.rawPayload || '').substring(0, 5000);\n}\n\n// Add timestamp here in the sub-workflow — don't rely on the parent to do it\nconst timestamp = new Date().toISOString();\n\nreturn [{\n  json: {\n    step,\n    errorMessage,\n    errorCode,\n    leadRecordId,\n    severity,\n    rawPayload,\n    timestamp,\n    resolved: false\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [208, 0],
+      "id": "722b39a1-2d50-4720-a956-944884c1ffd9",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appO1iAwuhRNNC3Ju",
+          "mode": "list",
+          "cachedResultName": "Lead Generation and Outreach Automation ",
+          "cachedResultUrl": "https://airtable.com/appO1iAwuhRNNC3Ju"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblgC7h7HwOg5fdCS",
+          "mode": "list",
+          "cachedResultName": "Table 3 — Error Logs",
+          "cachedResultUrl": "https://airtable.com/appO1iAwuhRNNC3Ju/tblgC7h7HwOg5fdCS"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Resolved": "={{ $json.resolved }}",
+            "Error Code": "={{ $json.errorCode }}",
+            "Timestamp": "={{ $json.timestamp }}",
+            "Workflow Step": "={{ $json.step }}",
+            "Error Message": "={{ $json.errorMessage }}",
+            "Raw Payload": "={{ $json.rawPayload }}",
+            "Severity": "={{ $json.severity }}",
+            "Lead ID": "={{ $json.leadRecordId ? [$json.leadRecordId] : [] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Workflow Step",
+              "displayName": "Workflow Step",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead Status (from Lead ID)",
+              "displayName": "Lead Status (from Lead ID)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Code",
+              "displayName": "Error Code",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw Payload",
+              "displayName": "Raw Payload",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resolved",
+              "displayName": "Resolved",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Severity",
+              "displayName": "Severity",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Warning",
+                  "value": "Warning"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                },
+                {
+                  "name": "Critical",
+                  "value": "Critical"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [768, 32],
+      "id": "a5246cf0-cf02-48b6-a342-5cd7dd5d3343",
+      "name": "Create a record1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "11585495-dc1c-4fd6-8e11-1c4d6ff0ef75",
+              "leftValue": "={{ $json.severity }}",
+              "rightValue": "Critical",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [416, 0],
+      "id": "856d0e20-db11-45dd-a565-6b6f9428a914",
+      "name": "if Critical set to true"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appO1iAwuhRNNC3Ju",
+          "mode": "list",
+          "cachedResultName": "Lead Generation and Outreach Automation ",
+          "cachedResultUrl": "https://airtable.com/appO1iAwuhRNNC3Ju"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblgC7h7HwOg5fdCS",
+          "mode": "list",
+          "cachedResultName": "Table 3 — Error Logs",
+          "cachedResultUrl": "https://airtable.com/appO1iAwuhRNNC3Ju/tblgC7h7HwOg5fdCS"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Resolved": "={{ $json.resolved }}",
+            "Error Code": "={{ $json.errorCode }}",
+            "Workflow Step": "={{ $json.step }}",
+            "Timestamp": "={{ $json.timestamp }}",
+            "Error Message": "={{ $json.errorMessage }}",
+            "Raw Payload": "={{ $json.rawPayload }}",
+            "Severity": "={{ $json.severity }}",
+            "Lead ID": "={{ $json.leadRecordId ? [$json.leadRecordId] : [] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Workflow Step",
+              "displayName": "Workflow Step",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead Status (from Lead ID)",
+              "displayName": "Lead Status (from Lead ID)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Code",
+              "displayName": "Error Code",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw Payload",
+              "displayName": "Raw Payload",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resolved",
+              "displayName": "Resolved",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Severity",
+              "displayName": "Severity",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Warning",
+                  "value": "Warning"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                },
+                {
+                  "name": "Critical",
+                  "value": "Critical"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [624, -96],
+      "id": "d1c35b0d-1f82-4f0c-8b2f-08b772bf6de2",
+      "name": "update to critical status",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AP7PR3E8M",
+          "mode": "list",
+          "cachedResultName": "automation-errors"
+        },
+        "text": "=*CRITICAL ERROR* in {{ $json.id }}\n\nError: {{ $json.fields[\"Error Message\"] }}\nLead ID: {{ $json.fields[\"Lead ID\"] }}\nTime: {{ $json.fields.Timestamp }}",
+        "otherOptions": {
+
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [832, -96],
+      "id": "fb1a921b-5c10-48cb-a536-2aaaf0efef64",
+      "name": "Send a message",
+      "webhookId": "132d493d-838b-416a-9a63-78cdf0d13751",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "vef3yw5qjheKJVCL",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {
+
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "if Critical set to true",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if Critical set to true": {
+      "main": [
+        [
+          {
+            "node": "update to critical status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update to critical status": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d092e5c4-4d90-486b-948e-8be9ebb556a1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2c950992e72c1f7626700d7c88cf07f1fa608dd6abbe3ba3e9ff0a6cfdcbd670"
+  },
+  "id": "6am4DhUVtAAnKxbB",
+  "tags": []
+}

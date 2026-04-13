@@ -1,0 +1,128 @@
+{
+  "name": "WEEK 6 PAUL_SIMON Google Calendar Availability",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "get-busy-dates",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8096a86b-42c2-473a-afe6-4b730c75bf6a",
+      "name": "Webhook",
+      "webhookId": "cb00ce9a-c600-40bf-b9fb-cd55a6b789d4"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "paul.emechebe@gmail.com",
+          "mode": "list",
+          "cachedResultName": "paul.emechebe@gmail.com"
+        },
+        "timeMin": "={{ $now.toISO() }}",
+        "timeMax": "={{ $now.plus({days: 60}).toISO() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "64aa3747-b7de-44bc-bd28-cbc41175ca4e",
+      "name": "Get many events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "4gXeMkaFOzQfzFjd",
+          "name": "Google Calendar OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let busyDates = [];\n\n// Loop over every event returned by Google Calendar\nfor (const item of $input.all()) {\n  // Calendar events sometimes use 'dateTime' (specific hours) and sometimes 'date' (all-day events)\n  const startObj = item.json.start;\n  const startString = startObj?.dateTime || startObj?.date;\n  \n  if (startString) {\n    // Split the timestamp at the 'T' and keep only the date portion (YYYY-MM-DD)\n    const dateOnly = startString.split('T')[0]; \n    \n    // Check if we already have this date in the array to avoid duplicates\n    if (!busyDates.includes(dateOnly)) {\n      busyDates.push(dateOnly);\n    }\n  }\n}\n\n// Return the properly formatted array wrapped in a JSON object\nreturn [{ \n  json: { \n    busyDates: busyDates \n  } \n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "fa05c1b1-1ef1-4370-a68b-b70d8f3b53c2",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        624,
+        0
+      ],
+      "id": "19d70851-a5d2-4757-a938-39c8e94db31c",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get many events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "450atFi5lhNgp3qp",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1,
+    "availableInMCP": false
+  },
+  "versionId": "2f77a663-5075-4717-8fe4-c674910ea4f8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2c950992e72c1f7626700d7c88cf07f1fa608dd6abbe3ba3e9ff0a6cfdcbd670"
+  },
+  "id": "Pzu0pG4XFXA1944s",
+  "tags": []
+}
