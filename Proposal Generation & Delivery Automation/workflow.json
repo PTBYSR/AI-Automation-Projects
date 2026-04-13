@@ -1,0 +1,1339 @@
+{
+  "name": "PAUL_SIMON_WEEK_3_AUTOMATION",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "moonshotai/kimi-k2-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        968,
+        640
+      ],
+      "id": "d47a733e-d46c-4562-9f25-37c9573ea6c4",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "XOHeDmIX9bZVDRLI",
+          "name": "Paul-Simon Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keep": "lastItems"
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        672,
+        416
+      ],
+      "id": "26af7ee5-0704-4dd6-bd3b-34fd4bab44e0",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1ZFKYm1eustzcURR6WaeBXxfn4EC8TcMGlo8Oif20j34",
+          "mode": "list",
+          "cachedResultName": "TEMPLATE Consulting Proposal",
+          "cachedResultUrl": "https://docs.google.com/document/d/1ZFKYm1eustzcURR6WaeBXxfn4EC8TcMGlo8Oif20j34/edit?usp=drivesdk"
+        },
+        "name": "=Proposal - {{ $json.Company_Name }} - {{ $json.Timestamp }}",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "13T8MxycxXG7imdvcR4ZnuuHotGrkJmka",
+          "mode": "list",
+          "cachedResultName": "Client Proposals",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/13T8MxycxXG7imdvcR4ZnuuHotGrkJmka"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2976,
+        128
+      ],
+      "id": "7abf7fb0-37c8-4638-ab55-f2d0237da034",
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "25NZ8WLebu7Hco9G",
+          "name": "Paul-Simon Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "7072ec26-21c1-488f-8164-98a1acbab05a",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        416
+      ],
+      "id": "46feb374-7679-4277-ad11-6d7c9866279e",
+      "name": "Webhook",
+      "webhookId": "7072ec26-21c1-488f-8164-98a1acbab05a"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Navigate through the new nested structure to find the text string\nconst rawText = $input.first().json.output[0].content[0].text;\n\n// Parse the string into clean, mappable JSON\nconst parsedData = JSON.parse(rawText);\n\n// Return it to n8n\nreturn [{ json: parsedData }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2752,
+        128
+      ],
+      "id": "4b866904-7704-44a9-8c53-46d581837fa5",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "{{Client_Name}}",
+              "replaceText": "={{ $('Code in JavaScript').item.json.Client_Name }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{Salesperson_Name}}",
+              "replaceText": "={{ $('Code in JavaScript').item.json.Salesperson_Name }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{Date_of_Call}}",
+              "replaceText": "={{ $('Code in JavaScript').item.json.Date_of_Call }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{Company_Name}}",
+              "replaceText": "={{ $('Code in JavaScript').item.json.Company_Name }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{Summary_of_Needs}}",
+              "replaceText": "={{ $('Code in JavaScript').item.json.Summary_of_Needs }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{Goals_and_Objectives}}",
+              "replaceText": "={{ $('Code in JavaScript').item.json.Goals_and_Objectives }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{Project_Scope}}",
+              "replaceText": "={{ $('Code in JavaScript').item.json.Project_Scope }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{Recommended_Approach}}",
+              "replaceText": "={{ $('Code in JavaScript').item.json.Recommended_Approach }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{Deliverables}}",
+              "replaceText": "={{ Array.isArray($('Code in JavaScript').item.json.Deliverables) ? $('Code in JavaScript').item.json.Deliverables.map(item => '• ' + item).join('\\n\\n') : $('Code in JavaScript').item.json.Deliverables }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{Proposed_Timeline}}",
+              "replaceText": "={{ $('Code in JavaScript').item.json.Proposed_Timeline }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{Estimated_Pricing}}",
+              "replaceText": "={{ String($('Code in JavaScript').item.json.Estimated_Pricing) }}",
+              "matchCase": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        3200,
+        128
+      ],
+      "id": "c8ec83df-82ce-4621-bc00-3ec77431cc52",
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "yQXoC9quUfxA9DLM",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.2",
+          "mode": "list",
+          "cachedResultName": "GPT-5.2"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are a professional proposal writer for a tech consulting company called Sourcing Sprints. Your job is to receive raw discovery call form data submitted by a salesperson after a client meeting, and transform the rough notes into polished, client-facing proposal copy.\n\nHere is the raw form data you must process:\n\n- Client Name: {{ $('Add ID').item.json.body[\"1. Client Name\"] }}\n- Client Email: {{ $('Add ID').item.json.body[\"2. Client Email\"] }}\n- Company Name: {{ $('Add ID').item.json.body[\"3. Company Name\"] }}\n- Date of Call: {{ $('Add ID').item.json.body[\"4. Date of Call\"] }}\n- Salesperson Name: {{ $('Add ID').item.json.body[\"5. Salesperson Name\"] }}\n- Salesperson Email: {{ $('Add ID').item.json.body[\"6. Salesperson Email\"] }}\n- Summary of Client Needs: {{ $('Add ID').item.json.body[\"7. Summary of Client's Needs\"] }}\n- Project Scope: {{ $('Add ID').item.json.body[\"8. Project Scope\"] }}\n- Goals and Objectives: {{ $('Add ID').item.json.body[\"9. Goals & Objectives\"] }}\n- Recommended Services/Deliverables: {{ $('Add ID').item.json.body[\"10. Recommended Services/Deliverables\"] }}\n- Proposed Timeline: {{ $('Add ID').item.json.body[\"11. Proposed Timeline\"] }}\n- Estimated Pricing: {{ $('Add ID').item.json.body[\"12. Estimated Pricing (USD)\"] }}\nYour output must ALWAYS be a single raw JSON object — no markdown, no code fences, no explanation, no preamble. Just the JSON.\n\nTone rules:\n- Professional, confident, and client-focused at all times.\n- Never use filler phrases like 'I hope this finds you well' or 'As per our conversation'.\n- Write as if the client will read this directly — it must be polished enough to send without edits.\n- Never refer to the salesperson's notes or the form — write as if this is original analysis.\n\nFormatting Rules:\n- NO DUPLICATE KEYS. You must output strictly valid JSON.\n- If you have multiple paragraphs for \"Project_Scope\" or \"Recommended_Approach\", combine them into a single string using \\n\\n for paragraph breaks.\n\nUse these exact keys and follow the transformation rules for each:\n\n{\n  \"Client_Name\": \"Copy exactly from form. Do not modify.\",\n  \"Client_Email\": \"Copy exactly from form. Do not modify.\",\n  \"Company_Name\": \"Copy exactly from form. Do not modify.\",\n  \"Date_of_Call\": \"Reformat the date to: Month DD, YYYY (e.g. March 09, 2026).\",\n  \"Salesperson_Name\": \"Copy exactly from form. Do not modify.\",\n  \"Salesperson_Email\": {{ $('Add ID').item.json.body[\"6. Salesperson Email\"] }},\n  \"Estimated_Pricing\": \"Copy exactly from form. Do not modify. Do not leave blank.\",\n  \"Proposed_Timeline\": \"Copy exactly from form. Do not modify. Do not leave blank.\",\n  \"Summary_of_Needs\": \"Rewrite the raw needs into 2 professional sentences for a client-facing proposal. Be specific about the client's industry and problem.\",\n  \"Goals_and_Objectives\": \"Rewrite the raw goals into a clean 2-3 sentence paragraph. Frame them as business outcomes, not a task list.\",\n  \"Project_Scope\": \"Expand the raw scope into 2 clear paragraphs describing what will be built and how it works. Use professional technical language.\",\n  \"Recommended_Approach\": \"This field does not exist in the form — generate it entirely from context. Write 2 paragraphs describing how Sourcing Sprints will execute this project (discovery, build, testing, handoff).\",\n  \"Deliverables\": [\"Convert the raw deliverables into an array of strings. Write each item as a full professional sentence.\", \"Item 2\", \"Item 3\"],\n  \"Timestamp\": {{ $('Add ID').item.json.body[\"11. Proposed Timeline\"] }},\n  \"Raw_Notes\": \"Write a single, highly condensed sentence summarizing the core problem and the proposed solution. This is for internal management to read at a glance.\"\n}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        2048,
+        224
+      ],
+      "id": "409f7477-2670-4e2d-b54e-77fa09ec63c6",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "openAiApi": {
+          "id": "8hPrBjFXvWvVS9z7",
+          "name": "OpenAi account 8"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Grab the raw text string from the LLM output\nlet rawText = $input.first().json.text;\n\n// 2. Strip out any accidental markdown formatting the LLM might hallucinate\nrawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();\n\n// 3. Parse the clean string into a real JSON object\nconst parsedData = JSON.parse(rawText);\n\n// 4. Return the usable data to n8n\nreturn [{ json: parsedData }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        320
+      ],
+      "id": "3fc72dbc-80d9-4c45-aaf8-9c5856e222a9",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "sendTo": "paul.emechebe@gmail.com",
+        "subject": "=Urgent: AI Proposal Generation Failed for {{ $('Webhook').item.json.body[\"3. Company Name\"] }}",
+        "emailType": "text",
+        "message": "=The LLM failed to generate the proposal after multiple retries.  Client: {{ $('Webhook').item.json.body[\"3. Company Name\"] }} Salesperson: {{ $('Webhook').item.json.body[\"5. Salesperson Name\"] }}  System Error Message: > {{ $json.error.message }} (Note: The exact path might be $json.error depending on your specific node).  Please check the API dashboard for billing or outage issues, and manually run the proposal generation for this client.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        536
+      ],
+      "id": "8554dfde-66de-4f4e-b2c0-23fd98703ac7",
+      "name": "Send LLM Error Message to Team",
+      "webhookId": "f7b17611-8ccf-43f5-b598-2a9c64444fce",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xnnomUD5bQ15tbH3",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are the QA Manager for a tech consulting firm called Sourcing Sprints. \nA salesperson has submitted raw discovery call notes. Your job is to evaluate whether ALL fields contain valid data so our Proposal AI can generate a flawless business proposal.\n\nEvaluate every single field below:\n\nContact & Admin Data:\n- Client Name: {{ $json.body[\"1. Client Name\"] }}\n- Client Email: {{ $json.body[\"2. Client Email\"] }}\n- Company Name: {{ $json.body[\"3. Company Name\"] }}\n- Date of Call: {{ $json.body[\"4. Date of Call\"] }}\n- Salesperson Name: {{ $json.body[\"5. Salesperson Name\"] }}\n- Salesperson Email: {{ $json.body[\"6. Salesperson Email\"] }}\n\nProject & Discovery Data:\n- Summary of Needs: {{ $json.body[\"7. Summary of Client's Needs\"] }}\n- Project Scope: {{ $json.body[\"8. Project Scope\"] }}\n- Goals and Objectives: {{ $json.body[\"9. Goals & Objectives\"] }}\n- Recommended Services: {{ $json.body[\"10. Recommended Services/Deliverables\"] }}\n- Proposed Timeline: {{ $json.body[\"11. Proposed Timeline\"] }}\n- Estimated Pricing: {{ $json.body[\"12. Estimated Pricing (USD)\"] }}\n\nREJECTION CRITERIA (If ANY of these are true, you must reject):\n1. Missing/TBD: Reject if ANY field is empty, says \"TBD\", \"Unknown\", \"N/A\", or similar.\n2. Invalid Contact Info: Reject if names or company names are just random letters.\n3. Insufficient Detail: Reject if \"Summary of Needs\", \"Project Scope\", \"Goals and Objectives\", or \"Recommended Services\" are too brief (e.g., just 1-3 words like \"needs app\", \"automation\", \"website\"). These fields require at least a full sentence of context.\n4. Unclear Financials: Reject if nothing is mentioned\n\nYour output must be a single raw JSON object. No markdown, no code blocks.\n\n{\n  \"is_approved\": true or false,\n  \"rejection_reason\": \"If false, write 1-2 sentences speaking directly to the salesperson. Name the exact field(s) that failed and explain what they need to fix. If true, leave blank.\"\n}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        896,
+        416
+      ],
+      "id": "61d4cb48-2c78-4030-940d-f972a78639cd",
+      "name": "LLM Validates Fields",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.2",
+          "mode": "list",
+          "cachedResultName": "GPT-5.2"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are the QA Manager for a tech consulting firm called Sourcing Sprints. \nA salesperson has submitted raw discovery call notes. Your job is to evaluate whether ALL fields contain valid, detailed data so our Proposal AI can generate a flawless business proposal.\n\nEvaluate every single field below:\n\nContact & Admin Data:\n- Client Name: {{ $json.body[\"1. Client Name\"] }}\n- Client Email: {{ $json.body[\"2. Client Email\"] }}\n- Company Name: {{ $json.body[\"3. Company Name\"] }}\n- Date of Call: {{ $json.body[\"4. Date of Call\"] }}\n- Salesperson Name: {{ $json.body[\"5. Salesperson Name\"] }}\n- Salesperson Email: {{ $json.body[\"6. Salesperson Email\"] }}\n\nProject & Discovery Data:\n- Summary of Needs: {{ $json.body[\"7. Summary of Client's Needs\"] }}\n- Project Scope: {{ $json.body[\"8. Project Scope\"] }}\n- Goals and Objectives: {{ $json.body[\"9. Goals & Objectives\"] }}\n- Recommended Services: {{ $json.body[\"10. Recommended Services/Deliverables\"] }}\n- Proposed Timeline: {{ $json.body[\"11. Proposed Timeline\"] }}\n- Estimated Pricing: {{ $json.body[\"12. Estimated Pricing (USD)\"] }}\n\nREJECTION CRITERIA (If ANY of these are true, you must reject):\n1. Missing/TBD: Reject if ANY field is empty, says \"TBD\", \"Unknown\", \"N/A\", or similar.\n2. Invalid Contact Info: Reject if names or company names are just random letters, or if emails are clearly fake/invalid format.\n3. Insufficient Detail: Reject if \"Summary of Needs\", \"Project Scope\", \"Goals and Objectives\", or \"Recommended Services\" are too brief (e.g., just 1-3 words like \"needs app\", \"automation\", \"website\"). These fields require at least a full sentence of context.\n4. Unclear Financials: Reject if the timeline or pricing is vague (e.g., \"we will see\", \"maybe later\").\n\nYour output must be a single raw JSON object. No markdown, no code blocks.\n\n{\n  \"is_approved\": true or false,\n  \"rejection_reason\": \"If false, write 1-2 sentences speaking directly to the salesperson. Name the exact field(s) that failed and explain what they need to fix. If true, leave blank.\"\n}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        1248,
+        488
+      ],
+      "id": "e76d462f-8723-4b4e-a7ca-77db7db908ac",
+      "name": "[FALLBACK BACKUP] LLM Validate Fields",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "openAiApi": {
+          "id": "8hPrBjFXvWvVS9z7",
+          "name": "OpenAi account 8"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional proposal writer for a tech consulting company called Sourcing Sprints. Your job is to receive raw discovery call form data submitted by a salesperson after a client meeting, and transform the rough notes into polished, client-facing proposal copy.\n\nHere is the raw form data you must process:\n\n- Client Name: {{ $('Add ID').item.json.body[\"1. Client Name\"] }}\n- Client Email: {{ $('Add ID').item.json.body[\"2. Client Email\"] }}\n- Company Name: {{ $('Add ID').item.json.body[\"3. Company Name\"] }}\n- Date of Call: {{ $('Add ID').item.json.body[\"4. Date of Call\"] }}\n- Salesperson Name: {{ $('Add ID').item.json.body[\"5. Salesperson Name\"] }}\n- Salesperson Email: {{ $('Add ID').item.json.body[\"6. Salesperson Email\"] }}\n- Summary of Client Needs: {{ $('Add ID').item.json.body[\"7. Summary of Client's Needs\"] }}\n- Project Scope: {{ $('Add ID').item.json.body[\"8. Project Scope\"] }}\n- Goals and Objectives: {{ $('Add ID').item.json.body[\"9. Goals & Objectives\"] }}\n- Recommended Services/Deliverables: {{ $('Add ID').item.json.body[\"10. Recommended Services/Deliverables\"] }}\n- Proposed Timeline: {{ $('Add ID').item.json.body[\"11. Proposed Timeline\"] }}\n- Estimated Pricing: {{ $('Add ID').item.json.body[\"12. Estimated Pricing (USD)\"] }}\nYour output must ALWAYS be a single raw JSON object — no markdown, no code fences, no explanation, no preamble. Just the JSON.\n\nTone rules:\n- Professional, confident, and client-focused at all times.\n- Never use filler phrases like 'I hope this finds you well' or 'As per our conversation'.\n- Write as if the client will read this directly — it must be polished enough to send without edits.\n- Never refer to the salesperson's notes or the form — write as if this is original analysis.\n\nFormatting Rules:\n- NO DUPLICATE KEYS. You must output strictly valid JSON.\n- If you have multiple paragraphs for \"Project_Scope\" or \"Recommended_Approach\", combine them into a single string using \\n\\n for paragraph breaks.\n\nUse these exact keys and follow the transformation rules for each:\n\n{\n  \"Client_Name\": \"Copy exactly from form. Do not modify.\",\n  \"Client_Email\": \"Copy exactly from form. Do not modify.\",\n  \"Company_Name\": \"Copy exactly from form. Do not modify.\",\n  \"Date_of_Call\": \"Reformat the date to: Month DD, YYYY (e.g. March 09, 2026).\",\n  \"Salesperson_Name\": \"Copy exactly from form. Do not modify.\",\n  \"Salesperson_Email\": {{ $('Add ID').item.json.body[\"6. Salesperson Email\"] }},\n  \"Estimated_Pricing\": \"Copy exactly from form. Do not modify. Do not leave blank.\",\n  \"Proposed_Timeline\": \"Copy exactly from form. Do not modify. Do not leave blank.\",\n  \"Summary_of_Needs\": \"Rewrite the raw needs into 2 professional sentences for a client-facing proposal. Be specific about the client's industry and problem.\",\n  \"Goals_and_Objectives\": \"Rewrite the raw goals into a clean 2-3 sentence paragraph. Frame them as business outcomes, not a task list.\",\n  \"Project_Scope\": \"Expand the raw scope into 2 clear paragraphs describing what will be built and how it works. Use professional technical language.\",\n  \"Recommended_Approach\": \"This field does not exist in the form — generate it entirely from context. Write 2 paragraphs describing how Sourcing Sprints will execute this project (discovery, build, testing, handoff).\",\n  \"Deliverables\": [\"Convert the raw deliverables into an array of strings. Write each item as a full professional sentence.\", \"Item 2\", \"Item 3\"],\n  \"Timestamp\": {{ $('Add ID').item.json.body[\"11. Proposed Timeline\"] }},\n  \"Raw_Notes\": \"Write a single, highly condensed sentence summarizing the core problem and the proposed solution. This is for internal management to read at a glance.\"\n}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        2400,
+        348
+      ],
+      "id": "2f762990-a0b7-40f5-a355-f4944daa5909",
+      "name": "LLM Validates Fields1",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "paul.emechebe@gmail.com",
+        "subject": "=Urgent: AI Proposal Generation Failed for {{ $('Webhook').item.json.body[\"3. Company Name\"] }}",
+        "emailType": "text",
+        "message": "=The LLM failed to generate the proposal after multiple retries.  Client: {{ $('Webhook').item.json.body[\"3. Company Name\"] }} Salesperson: {{ $('Webhook').item.json.body[\"5. Salesperson Name\"] }}  System Error Message: > {{ $json.error.message }} (Note: The exact path might be $json.error depending on your specific node).  Please check the API dashboard for billing or outage issues, and manually run the proposal generation for this client.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2752,
+        396
+      ],
+      "id": "5d005472-15f5-4761-a05d-5575f47fcf28",
+      "name": "Send LLM Error Message to Team1",
+      "webhookId": "f7b17611-8ccf-43f5-b598-2a9c64444fce",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xnnomUD5bQ15tbH3",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "moonshotai/kimi-k2-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        2472,
+        572
+      ],
+      "id": "819ea9d0-a559-4d2e-93f9-3c83c0e25423",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "XOHeDmIX9bZVDRLI",
+          "name": "Paul-Simon Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### Feedback Email for the sales person with adequte feedback on corrections to make\n\nIn this feedback email sent to the salesperson, i add a  detailed explanation to why the form details needs to be corrected. I used an LLM to summarize the problems with the invalid form data.",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        592
+      ],
+      "id": "61ee1c9b-4cab-4c22-b5b3-1b40d14b9cf3",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "df638230-d550-4c04-9024-34fe7510b87c",
+              "name": "Timestamp",
+              "value": "={{ $now.setZone('Africa/Lagos').toFormat('MMMM dd, yyyy - hh:mm a') }}",
+              "type": "string"
+            },
+            {
+              "id": "cbc72200-5cb5-441d-82f3-a11200bc89a1",
+              "name": "FormId",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        416
+      ],
+      "id": "cbf0b147-b9a2-4018-901b-509cdf660a73",
+      "name": "Add Timestamp"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cbc72200-5cb5-441d-82f3-a11200bc89a1",
+              "name": "FormId",
+              "value": "={{ $json.body[\"3. Company Name\"].replace(/[^a-zA-Z0-9]/g, '').toUpperCase() }}-{{ $json.body[\"4. Date of Call\"].replace(/[^a-zA-Z0-9]/g, '').toUpperCase() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        416
+      ],
+      "id": "40d0f38f-6e48-4c30-a69d-d9e018d09e09",
+      "name": "Add ID"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7de41b51-f2e9-4b88-bdf6-5a31abc4bc8c",
+              "leftValue": "={{ $json.is_approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "bcf88903-4b4d-4211-bb7b-48a2a88ebaf9",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1824,
+        320
+      ],
+      "id": "acee51e8-fa30-48ed-9b6f-0b3c8974b259",
+      "name": "Check if any form input is valid"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Limit').item.json.body[\"6. Salesperson Email\"] }}",
+        "subject": "=Action Required: Review Proposal form details for {{ $('Add ID').item.json.FormId }}",
+        "message": "=Hi {{ $('Add Timestamp').item.json.body[\"5. Salesperson Name\"] }},\n\nThe form submission for was missing critical details. Here is the feedback from the AI system: \"{{ $json.rejection_reason }}\"  We need high-quality inputs to generate a client-ready document. Please review your notes and resubmit the discovery form with the requested details.  \n\nThanks, \nSourcing Sprints Approver",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2112,
+        416
+      ],
+      "id": "8783352c-1f1d-419e-aaf1-53f596a5ab73",
+      "name": "Send a message to the salesperson to resubmit the form with corrections ",
+      "webhookId": "79be15d1-3495-4cc6-8e30-46ce94a65a56",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xnnomUD5bQ15tbH3",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appG4R3tTemLTnbni",
+          "mode": "list",
+          "cachedResultName": "Proposal",
+          "cachedResultUrl": "https://airtable.com/appG4R3tTemLTnbni"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblo9Nhb7TAXTrhHN",
+          "mode": "list",
+          "cachedResultName": "Error Logs",
+          "cachedResultUrl": "https://airtable.com/appG4R3tTemLTnbni/tblo9Nhb7TAXTrhHN"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Error ID",
+              "displayName": "Error ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "n8n Execution URL",
+              "displayName": "n8n Execution URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1824,
+        536
+      ],
+      "id": "d60e7f68-e1ac-4755-9c84-428516cfd65b",
+      "name": "Add Error Log to Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appG4R3tTemLTnbni",
+          "mode": "list",
+          "cachedResultName": "Proposal",
+          "cachedResultUrl": "https://airtable.com/appG4R3tTemLTnbni"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblo9Nhb7TAXTrhHN",
+          "mode": "list",
+          "cachedResultName": "Error Logs",
+          "cachedResultUrl": "https://airtable.com/appG4R3tTemLTnbni/tblo9Nhb7TAXTrhHN"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Error ID",
+              "displayName": "Error ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "n8n Execution URL",
+              "displayName": "n8n Execution URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2976,
+        396
+      ],
+      "id": "04f66e73-4e15-4473-9417-171060bac05b",
+      "name": "Add Error Log to Airtable1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Duplicate was handled in this airtable node below\n\nI used the airtable node operation create or update, which provides a field to map a column used to match the incoming record. i use the formId column so it checks if a formId already existing",
+        "height": 288,
+        "width": 272
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3552,
+        -176
+      ],
+      "id": "3a18d08c-198d-42f9-b9d9-be94400eef2c",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "### Part 1 Data Ingestion",
+        "width": 944
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        16,
+        1008
+      ],
+      "id": "82c4fdef-c5af-4c51-a47f-afe1283c5dff",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "### Part 2 Form Input Validation and Cleaning",
+        "width": 1488
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        992,
+        1008
+      ],
+      "id": "4ad6e2cb-7106-47b4-80a2-90c3a6cef62d",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "### Part 3 Updating the Tables",
+        "width": 1088
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2512,
+        1008
+      ],
+      "id": "d0050f7a-ffe2-4a3f-848e-b3555cf9b179",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Why an LLM node for validation?\n\nI saw that some data form fields like \"Project Scope\" cannot be validated efficiently with just regex. And i wanted the salesperson to give adequate data so as to avoid hallucinations to happen in the upcoming LLM node that expands the input.",
+        "height": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        912,
+        96
+      ],
+      "id": "f0da1285-a6dc-480f-8e18-a4860c3735b4",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appG4R3tTemLTnbni",
+          "mode": "list",
+          "cachedResultName": "Proposal",
+          "cachedResultUrl": "https://airtable.com/appG4R3tTemLTnbni"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblXekrOw7QqEVIxA",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appG4R3tTemLTnbni/tblXekrOw7QqEVIxA"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Company Name": "={{ $('Code in JavaScript').item.json.Company_Name }}",
+            "Client Name": "={{ $('Code in JavaScript').item.json.Client_Name }}",
+            "Salesperson": "={{ [ $('Code in JavaScript').item.json.Salesperson_Name ] }}",
+            "Client Email": "={{ $('Code in JavaScript').item.json.Client_Email }}",
+            "Call Date": "={{ $('Code in JavaScript').item.json.Date_of_Call }}",
+            "Budget Range": "={{ String($('Code in JavaScript').item.json.Estimated_Pricing) }}",
+            "Google Doc URL": "=https://docs.google.com/document/d/{{ $json.documentId }}/edit",
+            "Raw Notes": "={{ $('Code in JavaScript').item.json.Raw_Notes }}",
+            "Salesperson Email": "={{ $('Code in JavaScript').item.json.Salesperson_Email }}",
+            "Approver Status": "Pending",
+            "Form ID": "={{ $('Limit').item.json.FormId }}",
+            "id": "={{ $('Add ID').item.json.FormId }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Form ID",
+              "displayName": "Form ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Client Name",
+              "displayName": "Client Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Client Email",
+              "displayName": "Client Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Salesperson",
+              "displayName": "Salesperson",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Salesperson Email",
+              "displayName": "Salesperson Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Call Date",
+              "displayName": "Call Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Raw Notes",
+              "displayName": "Raw Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Budget Range",
+              "displayName": "Budget Range",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Google Doc URL",
+              "displayName": "Google Doc URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Approver Status",
+              "displayName": "Approver Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pending",
+                  "value": "Pending"
+                },
+                {
+                  "name": "Sent",
+                  "value": "Sent"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                },
+                {
+                  "name": "Rejected",
+                  "value": "Rejected"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Approver Notes",
+              "displayName": "Approver Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Sent At",
+              "displayName": "Sent At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Hours Pending",
+              "displayName": "Hours Pending",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3424,
+        128
+      ],
+      "id": "36f96740-f033-434f-bd58-977ec9e8ffce",
+      "name": "Update Proposals Table",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ch4bcqrxND1x4hCr",
+          "name": "Airtable Personal Access Token account 8"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "cohort2pod1.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (compatible; Google-Apps-Script; beanserver; +https://script.google.com; id: UAEmdDd8fh3rL1rlTutXFPnaQoksWjLW86vM)",
+            "content-length": "943",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "107.178.192.195",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "9df819c4e82416de-IAD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "107.178.192.195, 104.23.209.101",
+            "x-forwarded-host": "cohort2pod1.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-13-6fc766d76c-tnfxf",
+            "x-is-trusted": "yes",
+            "x-real-ip": "107.178.192.195"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "1. Client Name": "Paul",
+            "2. Client Email": "paul.emechebe@gmail.com",
+            "3. Company Name": "Sakura",
+            "4. Date of Call": "2026-03-25",
+            "5. Salesperson Name": "Ricktier",
+            "6. Salesperson Email": "rickiterwilson@gmail.com",
+            "7. Summary of Client's Needs": "Elevate Shop is manually copying order data from Shopify into their warehouse spreadsheet. They need an automated pipeline to sync inventory and generate shipping labels instantly.",
+            "8. Project Scope": "Build an integration syncing Shopify webhooks to an Airtable inventory base, and connect it to ShipStation for automated label generation.",
+            "9. Goals & Objectives": "Cut fulfillment errors to zero. Save the warehouse team 15 hours of manual data entry per week.",
+            "10. Recommended Services/Deliverables": "Shopify Webhook Configuration, Airtable Inventory System Build, Make.com/n8n Mapping, and 1 week of testing.",
+            "11. Proposed Timeline": "Short-term (1-4 Weeks)",
+            "12. Estimated Pricing (USD)": "3200"
+          },
+          "webhookUrl": "https://cohort2pod1.app.n8n.cloud/webhook-test/7072ec26-21c1-488f-8164-98a1acbab05a",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LLM Validates Fields",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "LLM Validates Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Add Timestamp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a document": {
+      "main": [
+        [
+          {
+            "node": "Update Proposals Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "LLM Validates Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Check if any form input is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM Validates Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[FALLBACK BACKUP] LLM Validate Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[FALLBACK BACKUP] LLM Validate Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send LLM Error Message to Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM Validates Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send LLM Error Message to Team1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send LLM Error Message to Team": {
+      "main": [
+        [
+          {
+            "node": "Add Error Log to Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LLM Validates Fields1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Timestamp": {
+      "main": [
+        [
+          {
+            "node": "Add ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add ID": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if any form input is valid": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message to the salesperson to resubmit the form with corrections ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send LLM Error Message to Team1": {
+      "main": [
+        [
+          {
+            "node": "Add Error Log to Airtable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Proposals Table": {
+      "main": [
+        [],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c2f56eff-6fbb-46c1-88f8-98111c6f5f22",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2c950992e72c1f7626700d7c88cf07f1fa608dd6abbe3ba3e9ff0a6cfdcbd670"
+  },
+  "id": "qyvCrPvJDHIputS8",
+  "tags": []
+}

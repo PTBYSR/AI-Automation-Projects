@@ -11,6 +11,11 @@ A curated collection of real-world AI automation systems, production-ready workf
 **The Solution:** An autonomous agent that monitors Gmail, identifies actual invoices while filtering spam, extracts key financial data via OpenAI, and synchronizes it with a Google Sheets ledger.
 - **Tech Stack:** Make.com, OpenAI GPT-4, PDF.co, Google Sheets.
 
+### 📝 [Proposal Generation & Delivery](file:///c:/Users/paule/OneDrive/Desktop/aap-repo/Proposal%20Generation%20&%20Delivery%20Automation)
+**The Problem:** Turning raw discovery call notes into polished, client-ready proposals is a time-consuming manual bottleneck.
+**The Solution:** An intelligent n8n pipeline that strictly validates sales notes using an LLM gatekeeper, expands them into professional copy, and automatically assembles a populated Google Doc wrapped in Airtable CRM tracking.
+- **Tech Stack:** n8n, OpenAI, Groq, Google Workspace, Airtable.
+
 ### 📢 [Content Distribution Automation](file:///c:/Users/paule/OneDrive/Desktop/aap-repo/Content%20Distribution%20Automation)
 **The Problem:** Creating platform-specific content for social media and newsletters is time-consuming.
 **The Solution:** A sophisticated publishing engine that repurposes technical articles into PAS-framed LinkedIn posts, X threads, and newsletters. Includes an AI-powered visual asset generator using Gemini Flash.
